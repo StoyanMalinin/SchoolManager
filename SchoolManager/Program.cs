@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using SchoolManager.Generation_utils;
 using SchoolManager.School_Models;
 
 namespace SchoolManager
@@ -29,14 +29,18 @@ namespace SchoolManager
                 new Teacher("kireto", new List<Subject>(){ subjects[1], subjects[2] }),
             };
 
-            List<Group> gropus = new List<Group>();
+            List<Group> groups = new List<Group>()
             {
                 new Group("12b",
-                          new List<Tuple<LimitationGroup, int>>() { Tuple.Create(limitationGroups[0], 2) },
-                          new List<Tuple<LimitationGroup, int>>() { Tuple.Create(limitationGroups[0], 6) });
+                          new List<Tuple<LimitationGroup, int>>() { Tuple.Create(limitationGroups[0], 2), Tuple.Create(limitationGroups[1], 1) },
+                          new List<Tuple<LimitationGroup, int>>() { Tuple.Create(limitationGroups[0], 6), Tuple.Create(limitationGroups[1], 3)  },
+                          new List<Tuple<Subject, Teacher>>() { Tuple.Create(subjects[0], teachers[0]), Tuple.Create(subjects[1], teachers[1]) })
             };
 
+            ScheduleGenerator sg = new ScheduleGenerator(groups, teachers, subjects);
+            string[,,] schedule = sg.generate();
 
+            sg.printSchedule(schedule);
         }
     }
 }
