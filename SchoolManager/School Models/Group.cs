@@ -13,7 +13,9 @@ namespace SchoolManager.School_Models
         public List<Tuple<LimitationGroup, int>> weekLims { get; set; }
      
         public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
+        
         private List<int>[] subjectDayDependees, subjectWeekDependees;
+        public int[] subjectDaySelf, subjectWeekSelf;
 
         public Group() { }
         public Group(string name, List<Tuple<LimitationGroup, int>> dayLims, 
@@ -27,6 +29,10 @@ namespace SchoolManager.School_Models
 
             this.subjectDayDependees = new List<int>[this.subject2Teacher.Count];
             this.subjectWeekDependees = new List<int>[this.subject2Teacher.Count];
+
+            this.subjectDaySelf = new int[this.subject2Teacher.Count];
+            this.subjectWeekSelf = new int[this.subject2Teacher.Count];
+
             for(int i = 0;i<subject2Teacher.Count;i++)
             {
                 subjectDayDependees[i] = new List<int>();
@@ -36,12 +42,20 @@ namespace SchoolManager.School_Models
                 {
                     for (int j = 0; j < dayLims.Count; j++)
                     {
-                        if (dayLims[j].Item1 == lg) subjectDayDependees[i].Add(j);
+                        if (dayLims[j].Item1 == lg)
+                        {
+                            subjectDayDependees[i].Add(j);
+                            if (dayLims[j].Item1.name == subject2Teacher[i].Item1.name) subjectDaySelf[i] = j;
+                        }
                     }
 
                     for (int j = 0; j < weekLims.Count; j++)
                     {
-                        if (weekLims[j].Item1 == lg) subjectWeekDependees[i].Add(j);
+                        if (weekLims[j].Item1 == lg)
+                        {
+                            subjectWeekDependees[i].Add(j);
+                            if (weekLims[j].Item1.name == subject2Teacher[i].Item1.name) subjectWeekSelf[i] = j;
+                        }
                     }
                 }
             }
@@ -60,6 +74,9 @@ namespace SchoolManager.School_Models
             output.subjectDayDependees = subjectDayDependees;
             output.subjectWeekDependees = subjectWeekDependees;
 
+            output.subjectDaySelf = subjectDaySelf;
+            output.subjectWeekSelf = subjectWeekSelf;
+
             return output;
         }
 
@@ -75,6 +92,9 @@ namespace SchoolManager.School_Models
 
             output.subjectDayDependees = subjectDayDependees;
             output.subjectWeekDependees = subjectWeekDependees;
+
+            output.subjectDaySelf = subjectDaySelf;
+            output.subjectWeekSelf = subjectWeekSelf;
 
             return output;
         }

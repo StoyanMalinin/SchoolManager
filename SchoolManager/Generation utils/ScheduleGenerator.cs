@@ -12,7 +12,7 @@ namespace SchoolManager.Generation_utils
 {
     class ScheduleGenerator
     {
-        const int workDays = 4;
+        const int workDays = 3;
         const int maxLessons = 4;
 
         List<Group> groups;
@@ -32,7 +32,8 @@ namespace SchoolManager.Generation_utils
         private bool[,,] usedGroup;
         private List<Group>[] dayState;
 
-        private List<int>[,] groupTeacherMatches; 
+        private List<int>[,] groupTeacherMatches;
+        private int cntGenerated = 0;
 
         private void gen(int day, int lesson, int teacherInd, string[,,] a)
         {
@@ -62,25 +63,45 @@ namespace SchoolManager.Generation_utils
                     //redo later
                     foreach (Group g in dayState[day])
                     {
+                        for (int s = 0;s < g.subject2Teacher.Count;s++)
+                        {
+                            int perDay = g.dayLims[g.subjectDaySelf[s]].Item2;
+                            int lessonsLeft = g.weekLims[g.subjectWeekSelf[s]].Item2;
+
+                            //if ((workDays - day + 1) * perDay < lessonsLeft) return;
+                        }
+
                         int lessonsPossible = 0;
                         for (int i = 0; i < g.dayLims.Count; i++)
                         {
                             lessonsPossible += Math.Min(g.dayLims[i].Item2, g.weekLims[i].Item2);
                         }
-
                         if (lessonsPossible < maxLessons) return;
                     }
                 }
             }
             if (day == workDays + 1)
             {
+                cntGenerated++;
                 result = a.Clone() as string[,,];
-                foreach (Group g in dayState[day - 1]) Console.WriteLine(g.dayLims[1].Item2);
+
+                if (cntGenerated == 1) Console.WriteLine("found you!");
+                if (cntGenerated % ((int)1e6) == 0) Console.WriteLine(cntGenerated);
+
+                
+                foreach (Group g in dayState[day - 1])
+                {
+                    Console.WriteLine(g.name);
+                    foreach(var x in g.weekLims)
+                        Console.WriteLine($"{x.Item1.name} - {x.Item2}");
+                    Console.WriteLine();
+                }
                 printSchedule(a);
 
                 Console.WriteLine();
                 Console.WriteLine();
                 Console.WriteLine();
+                
 
                 return;
             }
@@ -147,6 +168,8 @@ namespace SchoolManager.Generation_utils
             }
 
             gen(1, 1, 0, a);
+            Console.WriteLine($"cntGenerated = {cntGenerated}");
+
             return result;
         }
 
