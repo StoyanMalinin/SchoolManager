@@ -7,7 +7,6 @@ namespace SchoolManager.School_Models
     class Subject
     {
         public string name { get; set; }
-
         public List <LimitationGroup> limGroups { get; set; }
 
         public Subject() { }
@@ -15,8 +14,6 @@ namespace SchoolManager.School_Models
         {
             this.name = name;
             this.limGroups = limGroups;
-
-            this.limGroups.Add(new LimitationGroup(name));
         }
     }
 }

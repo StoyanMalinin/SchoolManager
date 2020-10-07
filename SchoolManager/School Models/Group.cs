@@ -11,7 +11,9 @@ namespace SchoolManager.School_Models
 
         public List<Tuple<LimitationGroup, int>> dayLims { get; set; }
         public List<Tuple<LimitationGroup, int>> weekLims { get; set; }
+     
         public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
+        private List<int>[] subjectDayDependees, subjectWeekDependees;
 
         public Group() { }
         public Group(string name, List<Tuple<LimitationGroup, int>> dayLims, 
@@ -22,6 +24,27 @@ namespace SchoolManager.School_Models
             this.dayLims = dayLims;
             this.weekLims = weekLims;
             this.subject2Teacher = subject2Teacher;
+
+            this.subjectDayDependees = new List<int>[this.subject2Teacher.Count];
+            this.subjectWeekDependees = new List<int>[this.subject2Teacher.Count];
+            for(int i = 0;i<subject2Teacher.Count;i++)
+            {
+                subjectDayDependees[i] = new List<int>();
+                subjectWeekDependees[i] = new List<int>();
+
+                foreach (LimitationGroup lg in subject2Teacher[i].Item1.limGroups)
+                {
+                    for (int j = 0; j < dayLims.Count; j++)
+                    {
+                        if (dayLims[j].Item1 == lg) subjectDayDependees[i].Add(j);
+                    }
+
+                    for (int j = 0; j < weekLims.Count; j++)
+                    {
+                        if (weekLims[j].Item1 == lg) subjectWeekDependees[i].Add(j);
+                    }
+                }
+            }
         }
 
         public Group CloneFull()
@@ -33,6 +56,9 @@ namespace SchoolManager.School_Models
 
             output.dayLims = dayLims.Select(x => Tuple.Create(x.Item1, x.Item2)).ToList();
             output.weekLims = weekLims.Select(x => Tuple.Create(x.Item1, x.Item2)).ToList();
+            
+            output.subjectDayDependees = subjectDayDependees;
+            output.subjectWeekDependees = subjectWeekDependees;
 
             return output;
         }
@@ -47,42 +73,35 @@ namespace SchoolManager.School_Models
             output.dayLims = dayLims.Select(x => Tuple.Create(x.Item1, x.Item2)).ToList();
             output.weekLims = weekLimsKeep;
 
+            output.subjectDayDependees = subjectDayDependees;
+            output.subjectWeekDependees = subjectWeekDependees;
+
             return output;
         }
 
-        public bool checkSubject(Subject s)
+        public bool checkSubject(int s)
         {
-            //optimize later
-            foreach(LimitationGroup lg in s.limGroups)
+            foreach(int ind in subjectDayDependees[s])
             {
-                foreach(var x in dayLims)
-                {
-                    if (x.Item1 == lg && x.Item2 == 0) return false; 
-                }
-                foreach (var x in weekLims)
-                {
-                    if (x.Item1 == lg && x.Item2 == 0) return false;
-                }
+                if (dayLims[ind].Item2 == 0) return false;
+            }
+            foreach (int ind in subjectWeekDependees[s])
+            {
+                if (weekLims[ind].Item2 == 0) return false;
             }
 
             return true;
         }
 
-        public void applySubject(Subject s, int sign)
+        public void applySubject(int s, int sign)
         {
-            //optimize later
-            foreach (LimitationGroup lg in s.limGroups)
+            foreach (int ind in subjectDayDependees[s])
             {
-                for (int i = 0; i < dayLims.Count; i++)
-                {
-                    if (dayLims[i].Item1 == lg)
-                        dayLims[i] = Tuple.Create(dayLims[i].Item1, dayLims[i].Item2 - sign);
-                }
-                for (int i = 0;i<weekLims.Count;i++)
-                {
-                    if (weekLims[i].Item1 == lg)
-                        weekLims[i] = Tuple.Create(weekLims[i].Item1, weekLims[i].Item2 - sign);
-                }
+                dayLims[ind] = Tuple.Create(dayLims[ind].Item1, dayLims[ind].Item2 - sign);
+            }
+            foreach (int ind in subjectWeekDependees[s])
+            {
+                weekLims[ind] = Tuple.Create(weekLims[ind].Item1, weekLims[ind].Item2 - sign);
             }
         }
     }
