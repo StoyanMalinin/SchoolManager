@@ -99,6 +99,17 @@ namespace SchoolManager.School_Models
             return output;
         }
 
+        public int getBottleneck(int s)
+        {
+            int bottleneck = int.MaxValue;
+            foreach (int ind in subjectDayDependees[s])
+            {
+                bottleneck = Math.Min(bottleneck, dayLims[ind].Item2);
+            }
+
+            return bottleneck;
+        }
+
         public bool checkSubject(int s)
         {
             foreach(int ind in subjectDayDependees[s])

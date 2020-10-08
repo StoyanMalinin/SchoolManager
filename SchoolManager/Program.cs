@@ -78,7 +78,7 @@ namespace SchoolManager
                 new Group("12b", dayLims, weekLims, subject2Teacher),
                 new Group("11a", dayLims, weekLims, subject2Teacher),
                 new Group("10v", dayLims, weekLims, subject2Teacher),
-                //new Group("9b", dayLims, weekLims, subject2Teacher),
+                new Group("9b", dayLims, weekLims, subject2Teacher),
             };
 
             ScheduleGenerator sg = new ScheduleGenerator(groups, teachers, subjects);

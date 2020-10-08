@@ -16,5 +16,11 @@ namespace SchoolManager.School_Models
             this.name = name;
             this.subjects = subjects;
         }
+
+        public Teacher Clone()
+        {
+            Teacher output = new Teacher(name, subjects);
+            return output;
+        }
     }
 }

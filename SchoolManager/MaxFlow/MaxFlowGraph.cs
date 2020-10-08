@@ -31,7 +31,7 @@ namespace SchoolManager.MaxFlow
         List<int> startInd;
         public List<int> dist { get; set; }
 
-        public MaxFlowGraph() 
+        public MaxFlowGraph()
         {
             this.dist = new List<int>();
             this.edges = new List<Edge>();
@@ -44,7 +44,11 @@ namespace SchoolManager.MaxFlow
             this.source = s;
 
             for (int i = 0; i <= n; i++)
+            {
                 this.adj.Add(new List<int>());
+                this.startInd.Add(0);
+                this.dist.Add(0);
+            }
         }
 
         public void setSourceSink(int s, int t)
@@ -56,10 +60,10 @@ namespace SchoolManager.MaxFlow
         public void addEdge(int u, int v, int cap)
         {
             edges.Add(new Edge(u, v, cap));
-            adj[u].Add(edges.Count-1);
+            adj[u].Add(edges.Count - 1);
 
-            edges.Add(new Edge(u, v, cap));
-            adj[u].Add(edges.Count-1);
+            edges.Add(new Edge(v, u, cap));
+            adj[v].Add(edges.Count - 1);
         }
 
         public void bfs(int x)
@@ -70,15 +74,15 @@ namespace SchoolManager.MaxFlow
             q.Enqueue(x);
             dist[x] = 0;
 
-            while(q.Count>0)
+            while (q.Count > 0)
             {
                 x = q.Peek();
                 q.Dequeue();
 
-                foreach(int eInd in adj[x])
+                foreach (int eInd in adj[x])
                 {
                     Edge e = edges[eInd];
-                    if(dist[e.v]==-1 && e.cap>0)
+                    if (dist[e.v] == -1 && e.cap > 0)
                     {
                         dist[e.v] = dist[x] + 1;
                         q.Enqueue(e.v);
@@ -91,36 +95,40 @@ namespace SchoolManager.MaxFlow
         {
             if (x == sink) return minVal;
 
-            foreach(int eInd in adj[x])
+            for (int i = startInd[x]; i < adj[x].Count; i++)
             {
+                int eInd = adj[x][i];
                 Edge e = edges[eInd];
-                if(dist[e.v]==dist[x]+1 && e.cap>0)
+
+                if (dist[e.v] == dist[x] + 1 && e.cap > 0)
                 {
                     int flow = dfs(e.v, Math.Min(minVal, e.cap));
-                    if(flow!=-1)
+                    if (flow != -1)
                     {
                         edges[eInd].cap -= flow;
-                        edges[eInd^1].cap += flow;
+                        edges[eInd ^ 1].cap += flow;
 
                         return flow;
                     }
                 }
+
+                startInd[x]++;
             }
 
             return -1;
         }
 
-        public int Dinic()
+        public long Dinic()
         {
-            int maxFlow = 0;
-            while(true)
+            long maxFlow = 0;
+            while (true)
             {
                 for (int i = 0; i < startInd.Count; i++) startInd[i] = 0;
 
                 bfs(source);
                 if (dist[sink] == -1) break;
 
-                while(true)
+                while (true)
                 {
                     int add = dfs(source, int.MaxValue);
                     if (add == -1) break;
