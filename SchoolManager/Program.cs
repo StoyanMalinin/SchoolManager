@@ -9,6 +9,20 @@ namespace SchoolManager
 {
     class Program
     {
+        private static Random rng = new Random();
+        private static void Shuffle<T>(IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
         static void Main(string[] args)
         {
             List<LimitationGroup> limitationGroups = new List<LimitationGroup>()
@@ -38,6 +52,9 @@ namespace SchoolManager
                 new Teacher("valcheto", new List<Subject>(){ subjects[1], subjects[2] }),
                 new Teacher("slav4eto", new List<Subject>(){ subjects[1], subjects[2] }),
                 new Teacher("gabarcheto", new List<Subject>(){  }),
+                new Teacher("krusteva", new List<Subject>(){  }),
+                new Teacher("dancheto", new List<Subject>(){  }),
+                new Teacher("balieva", new List<Subject>(){  }),
             };
 
             var dayLims = new List<Tuple<LimitationGroup, int>>() 
@@ -58,13 +75,13 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[1], 6969),
                 
                 Tuple.Create(limitationGroups[2], 5),
-                Tuple.Create(limitationGroups[3], 2),
-                Tuple.Create(limitationGroups[4], 3),
+                Tuple.Create(limitationGroups[3], 3),
+                Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 5),
                 Tuple.Create(limitationGroups[6], 5),
             };
 
-            var subject2Teacher = new List<Tuple<Subject, Teacher>>() 
+            var subject2Teacher1 = new List<Tuple<Subject, Teacher>>() 
             { 
                 Tuple.Create(subjects[0], teachers[0]), 
                 Tuple.Create(subjects[1], teachers[1]),
@@ -75,12 +92,26 @@ namespace SchoolManager
 
             List<Group> groups = new List<Group>()
             {
-                new Group("12b", dayLims, weekLims, subject2Teacher),
-                new Group("11a", dayLims, weekLims, subject2Teacher),
-                new Group("10v", dayLims, weekLims, subject2Teacher),
-                new Group("9b", dayLims, weekLims, subject2Teacher),
+                new Group("12b", dayLims, weekLims, subject2Teacher1),
+                new Group("11a", dayLims, weekLims, subject2Teacher1),
+                new Group("12a", dayLims, weekLims, subject2Teacher1),
+                //new Group("10v", dayLims, weekLims, subject2Teacher1),
+                //new Group("9b", dayLims, weekLims, subject2Teacher),
             };
 
+            var subject2Teacher2 = new List<Tuple<Subject, Teacher>>()
+            {
+                Tuple.Create(subjects[0], teachers[5]),
+                Tuple.Create(subjects[1], teachers[1]),
+                Tuple.Create(subjects[2], teachers[3]),
+                Tuple.Create(subjects[3], teachers[7]),
+                Tuple.Create(subjects[4], teachers[6]),
+            };
+
+            groups.Add(new Group("10v", dayLims, weekLims, subject2Teacher2));
+            groups.Add(new Group("9b", dayLims, weekLims, subject2Teacher2));
+
+            //Shuffle(groups);
             ScheduleGenerator sg = new ScheduleGenerator(groups, teachers, subjects);
 
             Stopwatch sw = new Stopwatch();

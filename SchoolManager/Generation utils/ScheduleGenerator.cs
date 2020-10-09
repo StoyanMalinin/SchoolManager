@@ -42,6 +42,20 @@ namespace SchoolManager.Generation_utils
         int lastDayTime = 0;
         Stopwatch sw = new Stopwatch();
 
+        private static Random rng = new Random();
+        private void Shuffle<T>(IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
         private bool completeSchedule(int [,,] a)
         {
             foreach (Group g in dayState[workDays])
@@ -173,7 +187,11 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            for (int g = 0;g < dayState[day].Count;g++)
+            List<int> groupInds = new List<int>();
+            for (int i = 0; i < groups.Count; i++) groupInds.Add(i);
+            //Shuffle(groupInds);
+
+            foreach (int g in groupInds)
             {
                 foreach(int s in groupTeacherMatches[g, teacherInd])
                 {
