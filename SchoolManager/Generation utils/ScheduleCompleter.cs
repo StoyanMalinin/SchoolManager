@@ -58,7 +58,7 @@ namespace SchoolManager.Generation_utils
         private List<Teacher> teachers;
 
         public ScheduleCompleter() { }
-        public ScheduleCompleter(List <Group> state, List <Teacher> teachers, int maxLessons)
+        public ScheduleCompleter(List<Group> state, List<Teacher> teachers, int maxLessons)
         {
             this.maxLessons = maxLessons;
             this.state = state.Select(x => x.CloneFull()).ToList();
@@ -66,7 +66,7 @@ namespace SchoolManager.Generation_utils
         }
 
         private string[,] output = null;
-        private bool[,] lessonTeacher;  
+        private bool[,] lessonTeacher;
         private List<int>[] solution;
 
         private List<int>[] teacherList;
@@ -83,7 +83,7 @@ namespace SchoolManager.Generation_utils
             int cnt = 0;
             void rec(int ind)
             {
-                if(ind==l.Count)
+                if (ind == l.Count)
                 {
                     cnt++;
 
@@ -93,9 +93,9 @@ namespace SchoolManager.Generation_utils
                     return;
                 }
 
-                for(int i = 0;i<l.Count;i++)
+                for (int i = 0; i < l.Count; i++)
                 {
-                    if(used[i]==false)
+                    if (used[i] == false)
                     {
                         used[i] = true;
                         curr.Add(l[i]);
@@ -103,7 +103,7 @@ namespace SchoolManager.Generation_utils
                         rec(ind + 1);
 
                         used[i] = false;
-                        curr.RemoveAt(curr.Count-1);
+                        curr.RemoveAt(curr.Count - 1);
                     }
                 }
             }
@@ -115,30 +115,30 @@ namespace SchoolManager.Generation_utils
         private void rec(int g)
         {
             if (output != null) return;
-            if(g==state.Count)
+            if (g == state.Count)
             {
                 output = new string[maxLessons + 1, teachers.Count];
                 for (int lesson = 1; lesson <= maxLessons; lesson++)
                     for (int t = 0; t < teachers.Count; t++)
                         output[lesson, t] = "---";
 
-                for(int i = 0;i<state.Count;i++)
+                for (int i = 0; i < state.Count; i++)
                 {
-                    for (int lesson = 0; lesson < solution[i].Count;lesson++)
+                    for (int lesson = 0; lesson < solution[i].Count; lesson++)
                     {
                         output[lesson + 1, solution[i][lesson]] = state[i].name;
                     }
                 }
-                
+
                 return;
             }
 
-            foreach(TeacherList tl in teacherPermList[g])
+            foreach (TeacherList tl in teacherPermList[g])
             {
                 bool fail = false;
-                for(int lesson = 0;lesson<tl.l.Count;lesson++)
+                for (int lesson = 0; lesson < tl.l.Count; lesson++)
                 {
-                    if(lessonTeacher[lesson, tl.l[lesson]]==true)
+                    if (lessonTeacher[lesson, tl.l[lesson]] == true)
                     {
                         fail = true;
                         break;
@@ -174,7 +174,7 @@ namespace SchoolManager.Generation_utils
                 teacherList[g] = new List<int>();
                 for (int s = 0; s < state[g].subject2Teacher.Count; s++)
                 {
-                    if (state[g].weekLims[state[g].subjectWeekSelf[s]].Item2 == 0) continue;
+                    if (state[g].weekLims[state[g].subjectWeekSelf[s]].cnt == 0) continue;
 
                     int t = -1;
                     for (int i = 0; i < teachers.Count; i++)
@@ -187,15 +187,15 @@ namespace SchoolManager.Generation_utils
                     }
 
 
-                    for(int iter = 0;iter< state[g].weekLims[state[g].subjectWeekSelf[s]].Item2;iter++)
+                    for (int iter = 0; iter < state[g].weekLims[state[g].subjectWeekSelf[s]].cnt; iter++)
                         teacherList[g].Add(t);
                 }
             }
 
-            for(int g = 0;g<state.Count;g++)
+            for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
-                
+
                 //Console.WriteLine(string.Join(", ", teacherList[g]));
                 //foreach (var l in teacherPermList[g]) Console.WriteLine(string.Join(" ", l));
             }

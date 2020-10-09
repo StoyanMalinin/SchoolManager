@@ -62,7 +62,7 @@ namespace SchoolManager.MaxFlow
             edges.Add(new Edge(u, v, cap));
             adj[u].Add(edges.Count - 1);
 
-            edges.Add(new Edge(v, u, cap));
+            edges.Add(new Edge(v, u, 0));
             adj[v].Add(edges.Count - 1);
         }
 

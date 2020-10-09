@@ -1,6 +1,7 @@
 ﻿using SchoolManager.School_Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -35,18 +36,29 @@ namespace SchoolManager.Generation_utils
         private List<int>[,] groupTeacherMatches;
         private int cntGenerated = 0;
 
+        int lastDayTime = 0;
+        Stopwatch sw = new Stopwatch();
+
         private bool completeSchedule(string [,,] a)
         {
             foreach (Group g in dayState[workDays])
             {
                 for (int i = 0; i < g.subject2Teacher.Count; i++)
                 {
-                    if (g.getBottleneck(i) < g.weekLims[g.subjectWeekSelf[i]].Item2) return false;
+                    if (g.getBottleneck(i) < g.weekLims[g.subjectWeekSelf[i]].cnt) return false;
                 }
             }
 
+            cntGenerated++;
+            if (cntGenerated == 1) Console.WriteLine("found you!");
+            if (cntGenerated % ((int)1e4) == 0) Console.WriteLine(cntGenerated);
+
+            sw.Restart();
             ScheduleCompleter sc = new ScheduleCompleter(dayState[workDays], teachers, maxLessons);
             string[,] lastDay = sc.gen();
+            sw.Stop();
+
+            lastDayTime += (int)sw.ElapsedMilliseconds;
 
             if (lastDay == null) return false;
 
@@ -88,8 +100,8 @@ namespace SchoolManager.Generation_utils
                     {
                         for (int s = 0;s < g.subject2Teacher.Count;s++)
                         {
-                            int perDay = g.dayLims[g.subjectDaySelf[s]].Item2;
-                            int lessonsLeft = g.weekLims[g.subjectWeekSelf[s]].Item2;
+                            int perDay = g.dayLims[g.subjectDaySelf[s]].cnt;
+                            int lessonsLeft = g.weekLims[g.subjectWeekSelf[s]].cnt;
 
                             if ((workDays - day + 1) * perDay < lessonsLeft) return;
                         }
@@ -97,7 +109,7 @@ namespace SchoolManager.Generation_utils
                         int lessonsPossible = 0;
                         for (int i = 0; i < g.dayLims.Count; i++)
                         {
-                            lessonsPossible += Math.Min(g.dayLims[i].Item2, g.weekLims[i].Item2);
+                            lessonsPossible += Math.Min(g.dayLims[i].cnt, g.weekLims[i].cnt);
                         }
                         if (lessonsPossible < maxLessons) return;
                     }
@@ -111,7 +123,8 @@ namespace SchoolManager.Generation_utils
                             {
                                 if(g.subject2Teacher[s].Item2.name==teachers[t].name)
                                 {
-                                    requested += g.weekLims[g.subjectWeekSelf[s]].Item2;
+                                    requested += g.weekLims[g.subjectWeekSelf[s]].cnt;
+                                    break;
                                 }
                             }
                         }
@@ -122,10 +135,6 @@ namespace SchoolManager.Generation_utils
             }
             if (day == workDays)
             {
-                cntGenerated++;
-                if (cntGenerated == 1) Console.WriteLine("found you!");
-                if (cntGenerated % ((int)1e4) == 0) Console.WriteLine(cntGenerated);
-
                 if (completeSchedule(a) == false) return;
                 
 
@@ -133,7 +142,7 @@ namespace SchoolManager.Generation_utils
                 {
                     Console.WriteLine(g.name);
                     foreach(var x in g.weekLims)
-                        Console.WriteLine($"{x.Item1.name} - {x.Item2}");
+                        Console.WriteLine($"{x.g.name} - {x.cnt}");
                     Console.WriteLine();
                 }
                 printSchedule(result);
@@ -149,8 +158,8 @@ namespace SchoolManager.Generation_utils
             {
                 foreach(int s in groupTeacherMatches[g, teacherInd])
                 {
-                    if (dayState[day][g].checkSubject(s)==true
-                        && usedGroup[day, lesson, g] == false)
+                    if (usedGroup[day, lesson, g] == false
+                        && dayState[day][g].checkSubject(s) == true)
                     {
                         usedGroup[day, lesson, g] = true;
                         a[day, lesson, teacherInd] = dayState[day][g].name;
@@ -177,6 +186,7 @@ namespace SchoolManager.Generation_utils
 
             gen(1, 1, 0, a);
             Console.WriteLine($"cntGenerated = {cntGenerated}");
+            Console.WriteLine($"lastDayTime = {lastDayTime}");
 
             return result;
         }
