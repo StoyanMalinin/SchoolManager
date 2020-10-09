@@ -57,11 +57,11 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969), 
                 Tuple.Create(limitationGroups[1], 6969),
                 
-                Tuple.Create(limitationGroups[2], 4),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
-                Tuple.Create(limitationGroups[4], 2),
-                Tuple.Create(limitationGroups[5], 4),
-                Tuple.Create(limitationGroups[6], 4),
+                Tuple.Create(limitationGroups[4], 3),
+                Tuple.Create(limitationGroups[5], 5),
+                Tuple.Create(limitationGroups[6], 5),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>() 

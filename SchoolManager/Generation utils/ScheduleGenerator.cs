@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,7 +15,7 @@ namespace SchoolManager.Generation_utils
     class ScheduleGenerator
     {
         const int workDays = 4;
-        const int maxLessons = 4;
+        const int maxLessons = 5;
 
         List<Group> groups;
         List<Teacher> teachers;
@@ -36,10 +37,12 @@ namespace SchoolManager.Generation_utils
         private List<int>[,] groupTeacherMatches;
         private int cntGenerated = 0;
 
+        private int[] teacherFreeLesons;
+
         int lastDayTime = 0;
         Stopwatch sw = new Stopwatch();
 
-        private bool completeSchedule(string [,,] a)
+        private bool completeSchedule(int [,,] a)
         {
             foreach (Group g in dayState[workDays])
             {
@@ -62,7 +65,12 @@ namespace SchoolManager.Generation_utils
 
             if (lastDay == null) return false;
 
-            result = a.Clone() as string[,,];
+            result = new string[workDays+1, maxLessons+1, teachers.Count];
+            for (int d = 1; d < workDays; d++)
+                for (int l = 1; l <= maxLessons; l++)
+                    for (int t = 0; t < teachers.Count; t++)
+                        result[d, l, t] = ((a[d, l, t]!= groups.Count + 1) ?groups[a[d, l, t]-1].name:"---");
+
             for (int lesson = 1; lesson <= maxLessons; lesson++)
                 for (int t = 0; t < teachers.Count; t++)
                     result[workDays, lesson, t] = lastDay[lesson, t];
@@ -70,7 +78,8 @@ namespace SchoolManager.Generation_utils
             return true;
         }
 
-        private void gen(int day, int lesson, int teacherInd, string[,,] a)
+        private void gen(int day, int lesson, int teacherInd, int[,,] a, 
+                         short[] lastLessonCode, bool lastLessonSmaller)
         {
             if (result != null) return;
 
@@ -85,11 +94,22 @@ namespace SchoolManager.Generation_utils
                     }
                 }
 
+                lastLessonSmaller = false;
+                for (int t = 0; t < teachers.Count; t++)
+                    lastLessonCode[t] = (short)a[day, lesson, t];
+
                 teacherInd = 0; 
                 lesson++;
             }
             if(lesson==maxLessons+1)
             {
+                /*
+                lastDaySmaller = false;
+                for (int l = 1; l <= maxLessons; l++)
+                     for (int t = 0; t < teachers.Count; t++)
+                         lastDayCode[(l-1)*teachers.Count+t] = (short)a[day, l, t];
+                */
+
                 lesson = 1; 
                 day++;
 
@@ -137,7 +157,6 @@ namespace SchoolManager.Generation_utils
             {
                 if (completeSchedule(a) == false) return;
                 
-
                 foreach (Group g in dayState[day - 1])
                 {
                     Console.WriteLine(g.name);
@@ -158,33 +177,52 @@ namespace SchoolManager.Generation_utils
             {
                 foreach(int s in groupTeacherMatches[g, teacherInd])
                 {
+                    if (lastLessonSmaller == false && lesson != 1 && lastLessonCode[teacherInd] > g+1) continue;
+                    //if (lastDaySmaller == false && day != 1 && lastDayCode[teachers.Count * (lesson - 1) + teacherInd] > g+1) continue;
+
                     if (usedGroup[day, lesson, g] == false
                         && dayState[day][g].checkSubject(s) == true)
                     {
                         usedGroup[day, lesson, g] = true;
-                        a[day, lesson, teacherInd] = dayState[day][g].name;
+                        a[day, lesson, teacherInd] = g + 1;
                         dayState[day][g].applySubject(s, +1);
 
-                        gen(day, lesson, teacherInd + 1, a);
+                        bool newLastLessonSmaller = (lastLessonSmaller | (lastLessonCode[teacherInd] < g + 1));
+                        //bool newLastDaySmaller = (lastDaySmaller | (lastDayCode[teachers.Count * (lesson - 1) + teacherInd] < g + 1));
+
+                        gen(day, lesson, teacherInd + 1, a, lastLessonCode, newLastLessonSmaller);
 
                         dayState[day][g].applySubject(s, -1);
-                        a[day, lesson, teacherInd] = "---";
+                        a[day, lesson, teacherInd] = 0;
                         usedGroup[day, lesson, g] = false;
                     }
                 }
             }
 
-            a[day, lesson, teacherInd] = "---";
-            gen(day, lesson, teacherInd + 1, a);
-            a[day, lesson, teacherInd] = "---";
+            if(teacherFreeLesons[teacherInd]>0
+                && (!(lastLessonSmaller == false && lesson != 1 && lastLessonCode[teacherInd] > groups.Count + 1)))
+                //&& (!(lastDaySmaller == false && day != 1 && lastDayCode[teachers.Count * (lesson - 1) + teacherInd] > 0)))
+            {
+                teacherFreeLesons[teacherInd]--;
+                a[day, lesson, teacherInd] = groups.Count + 1;
+
+                bool newLastLessonSmaller = (lastLessonSmaller | (lastLessonCode[teacherInd] < groups.Count + 1));
+                //bool newLastDaySmaller = (lastDaySmaller | (lastDayCode[teachers.Count * (lesson - 1) + teacherInd] < 0));
+
+                gen(day, lesson, teacherInd + 1, a, lastLessonCode, newLastLessonSmaller);
+                
+                a[day, lesson, teacherInd] = groups.Count + 1;
+                teacherFreeLesons[teacherInd]++;
+            }
+            
         }
 
         public string[,,] generate()
         {
-            string[,,] a = new string[workDays+1, maxLessons+1, teachers.Count];
+            int[,,] a = new int[workDays+1, maxLessons+1, teachers.Count];
             initGeneration();
 
-            gen(1, 1, 0, a);
+            gen(1, 1, 0, a, new short[teachers.Count], false);
             Console.WriteLine($"cntGenerated = {cntGenerated}");
             Console.WriteLine($"lastDayTime = {lastDayTime}");
 
@@ -239,6 +277,21 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
+
+            teacherFreeLesons = new int[teachers.Count];
+            for (int t = 0; t < teachers.Count; t++) teacherFreeLesons[t] = workDays * maxLessons;
+
+            for (int g = 0; g < groups.Count; g++)
+            {
+                for (int t = 0; t < teachers.Count; t++)
+                {
+                    foreach (int s in groupTeacherMatches[g, t])
+                        teacherFreeLesons[t] -= groups[g].weekLims[groups[g].subjectWeekSelf[s]].cnt;
+                }
+            }
+
+            for (int t = 0; t < teachers.Count; t++)
+                Console.WriteLine($"{teachers[t].name} - {teacherFreeLesons[t]}");
         }
     }
 }

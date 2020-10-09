@@ -186,7 +186,6 @@ namespace SchoolManager.Generation_utils
                         }
                     }
 
-
                     for (int iter = 0; iter < state[g].weekLims[state[g].subjectWeekSelf[s]].cnt; iter++)
                         teacherList[g].Add(t);
                 }
