@@ -55,6 +55,7 @@ namespace SchoolManager
                 new Teacher("krusteva", new List<Subject>(){  }),
                 new Teacher("dancheto", new List<Subject>(){  }),
                 new Teacher("balieva", new List<Subject>(){  }),
+                new Teacher("lateva", new List<Subject>(){  }),
             };
 
             var dayLims = new List<Tuple<LimitationGroup, int>>() 
@@ -74,20 +75,20 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969), 
                 Tuple.Create(limitationGroups[1], 6969),
                 
-                Tuple.Create(limitationGroups[2], 5),
+                Tuple.Create(limitationGroups[2], 6),
                 Tuple.Create(limitationGroups[3], 3),
-                Tuple.Create(limitationGroups[4], 2),
-                Tuple.Create(limitationGroups[5], 5),
-                Tuple.Create(limitationGroups[6], 5),
+                Tuple.Create(limitationGroups[4], 4),
+                Tuple.Create(limitationGroups[5], 6),
+                Tuple.Create(limitationGroups[6], 6),
             };
 
             var subject2Teacher1 = new List<Tuple<Subject, Teacher>>() 
             { 
                 Tuple.Create(subjects[0], teachers[0]), 
-                Tuple.Create(subjects[1], teachers[1]),
-                Tuple.Create(subjects[2], teachers[3]),
                 Tuple.Create(subjects[3], teachers[2]),
                 Tuple.Create(subjects[4], teachers[4]),
+                Tuple.Create(subjects[2], teachers[3]),
+                Tuple.Create(subjects[1], teachers[1]),
             };
 
             List<Group> groups = new List<Group>()
@@ -102,14 +103,15 @@ namespace SchoolManager
             var subject2Teacher2 = new List<Tuple<Subject, Teacher>>()
             {
                 Tuple.Create(subjects[0], teachers[5]),
-                Tuple.Create(subjects[1], teachers[1]),
-                Tuple.Create(subjects[2], teachers[3]),
                 Tuple.Create(subjects[3], teachers[7]),
                 Tuple.Create(subjects[4], teachers[6]),
+                Tuple.Create(subjects[1], teachers[8]),
+                Tuple.Create(subjects[2], teachers[3]),
             };
 
             groups.Add(new Group("10v", dayLims, weekLims, subject2Teacher2));
             groups.Add(new Group("9b", dayLims, weekLims, subject2Teacher2));
+            groups.Add(new Group("8g", dayLims, weekLims, subject2Teacher2));
 
             //Shuffle(groups);
             ScheduleGenerator sg = new ScheduleGenerator(groups, teachers, subjects);

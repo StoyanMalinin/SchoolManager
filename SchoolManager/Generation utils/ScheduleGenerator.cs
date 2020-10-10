@@ -14,7 +14,7 @@ namespace SchoolManager.Generation_utils
 {
     class ScheduleGenerator
     {
-        const int workDays = 4;
+        const int workDays = 5;
         const int maxLessons = 5;
 
         List<Group> groups;
@@ -262,26 +262,8 @@ namespace SchoolManager.Generation_utils
             }
         }
 
-        private void initGeneration()
+        private void initGroupTeacherMatches()
         {
-            usedGroup = new bool[workDays + 1, maxLessons + 1, teachers.Count];
-            for (int day = 1; day <= workDays; day++)
-                for (int lesson = 1; lesson <= maxLessons; lesson++)
-                    for (int groupInd = 0; groupInd < groups.Count; groupInd++)
-                        usedGroup[day, lesson, groupInd] = false;
-
-            dayState = new List<Group>[workDays + 1];
-
-            dayState[1] = groups.Select(x => x.CloneFull()).ToList();
-            for (int i = 2; i <= workDays; i++)
-            {
-                dayState[i] = new List<Group>();
-                for (int j = 0; j < dayState[1].Count; j++)
-                {
-                    dayState[i].Add(dayState[1][j].ClonePartial(dayState[1][j].weekLims));
-                }
-            }
-
             groupTeacherMatches = new List<int>[groups.Count, teachers.Count];
             for (int g = 0; g < groups.Count; g++)
             {
@@ -295,6 +277,17 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
+        }
+
+        private void initGeneration()
+        {
+            usedGroup = new bool[workDays + 1, maxLessons + 1, teachers.Count];
+            for (int day = 1; day <= workDays; day++)
+                for (int lesson = 1; lesson <= maxLessons; lesson++)
+                    for (int groupInd = 0; groupInd < groups.Count; groupInd++)
+                        usedGroup[day, lesson, groupInd] = false;
+
+            initGroupTeacherMatches();
 
             teacherFreeLesons = new int[teachers.Count];
             for (int t = 0; t < teachers.Count; t++) teacherFreeLesons[t] = workDays * maxLessons;
@@ -305,6 +298,26 @@ namespace SchoolManager.Generation_utils
                 {
                     foreach (int s in groupTeacherMatches[g, t])
                         teacherFreeLesons[t] -= groups[g].weekLims[groups[g].subjectWeekSelf[s]].cnt;
+                }
+            }
+
+            for(int g = 0;g<groups.Count;g++)
+            {
+                groups[g].subject2Teacher.OrderByDescending(x => groupTeacherMatches[g, teachers.FindIndex(y => y.name == x.Item2.name)]);
+                Console.WriteLine(string.Join(" ", groups[g].subject2Teacher.Select(x => x.Item2.name)));
+            }
+
+            initGroupTeacherMatches();
+
+            dayState = new List<Group>[workDays + 1];
+
+            dayState[1] = groups.Select(x => x.CloneFull()).ToList();
+            for (int i = 2; i <= workDays; i++)
+            {
+                dayState[i] = new List<Group>();
+                for (int j = 0; j < dayState[1].Count; j++)
+                {
+                    dayState[i].Add(dayState[1][j].ClonePartial(dayState[1][j].weekLims));
                 }
             }
 
