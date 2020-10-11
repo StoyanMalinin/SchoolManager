@@ -12,8 +12,8 @@ Global
 		Super duper barzo|Any CPU = Super duper barzo|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{20BC4B41-B26A-4A9C-9939-9F4BDC6567D8}.Super duper barzo|Any CPU.ActiveCfg = Release|Any CPU

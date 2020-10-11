@@ -11,3 +11,16 @@ C:\Users\Stoyan\Desktop\Stoyan\Work\bahti golemite proekti brat\school manager\S
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti golemite proekti brat\school manager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.pdb
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti golemite proekti brat\school manager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.genruntimeconfig.cache
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti golemite proekti brat\school manager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csprojAssemblyReference.cache
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.exe
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.deps.json
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.runtimeconfig.json
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.runtimeconfig.dev.json
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.dll
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.pdb
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csprojAssemblyReference.cache
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.AssemblyInfoInputs.cache
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.AssemblyInfo.cs
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csproj.CoreCompileInputs.cache
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.dll
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.pdb
+C:\Users\Stoyan\source\repos\SchoolManager\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.genruntimeconfig.cache

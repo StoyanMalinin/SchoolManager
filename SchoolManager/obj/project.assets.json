@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\SchoolManager.csproj",
+      "projectUniqueName": "C:\\Users\\Stoyan\\source\\repos\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
       "projectName": "SchoolManager",
-      "projectPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\SchoolManager.csproj",
+      "projectPath": "C:\\Users\\Stoyan\\source\\repos\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
       "packagesPath": "C:\\Users\\Stoyan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\obj\\",
+      "outputPath": "C:\\Users\\Stoyan\\source\\repos\\SchoolManager\\SchoolManager\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -62,7 +62,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
       }
     }
   }
