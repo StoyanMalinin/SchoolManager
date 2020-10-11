@@ -1,4 +1,5 @@
-﻿using SchoolManager.School_Models;
+﻿using SchoolManager.MaxFlow;
+using SchoolManager.School_Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,6 +66,7 @@ namespace SchoolManager.Generation_utils
                     if (g.getBottleneck(i) < g.weekLims[g.subjectWeekSelf[i]].cnt) return false;
                 }
             }
+            
 
             cntGenerated++;
             if (cntGenerated == 1) Console.WriteLine("found you!");
@@ -92,14 +94,54 @@ namespace SchoolManager.Generation_utils
             return true;
         }
 
+        private bool checkLesson(int day, int lesson)
+        {
+            int[] groupNode = new int[groups.Count];
+            int[] teacherNode = new int[teachers.Count];
+
+            int nodeCnt = 3;
+            for (int g = 0; g < groups.Count; g++) {groupNode[g] = nodeCnt; nodeCnt++;}
+            for (int t = 0; t < teachers.Count; t++) {teacherNode[t] = nodeCnt; nodeCnt++;}
+
+            MaxFlowGraph G = new MaxFlowGraph(groups.Count + teachers.Count + 2, 1, 2);
+            for (int g = 0;g<groups.Count;g++)
+            {
+                for(int t = 0;t<teachers.Count;t++)
+                {
+                    foreach (int s in groupTeacherMatches[g, t])
+                    {
+                        if (usedGroup[day, lesson, g] == false
+                            && dayState[day][g].checkSubject(s) == true)
+                        {
+                            G.addEdge(groupNode[g], teacherNode[t], 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            for (int g = 0; g < groups.Count; g++) G.addEdge(1, groupNode[g], 1);
+            for (int t = 0; t < teachers.Count; t++) G.addEdge(teacherNode[t], 2, 1);
+
+            int matching = (int)G.Dinic();
+            if (matching != groups.Count) return false;
+
+            return true;
+        }
+
         private void gen(int day, int lesson, int teacherInd, int[,,] a, 
                          short[] lastLessonCode, bool lastLessonSmaller)
         {
             if (result != null) return;
+            //if (day >= 4) Console.WriteLine($"{day} {lesson} {teacherInd}");
 
             if (teacherInd==teachers.Count) 
             {
-                //add special skip condition
+                //cntGenerated++;
+                //if (cntGenerated % (int)1e4 == 0) Console.WriteLine(cntGenerated);
+
+                //return;
+
+                //add а special skip condition
                 for (int i = 0; i < groups.Count; i++)
                 {
                     if (usedGroup[day, lesson, i] == false)
@@ -114,6 +156,21 @@ namespace SchoolManager.Generation_utils
 
                 teacherInd = 0; 
                 lesson++;
+
+                if(lesson!=maxLessons+1)
+                {
+                    foreach (Group g in dayState[day])
+                    {
+                        int lessonsPossible = 0;
+                        for (int i = 2; i < g.dayLims.Count; i++)
+                        {
+                            lessonsPossible += Math.Min(g.dayLims[i].cnt, g.weekLims[i].cnt);
+                        }
+                        if (lessonsPossible < maxLessons - lesson + 1) return;
+                    }
+                }
+                
+                //if (lesson != maxLessons + 1 && checkLesson(day, lesson) == false) return;
             }
             if(lesson==maxLessons+1)
             {
@@ -140,8 +197,9 @@ namespace SchoolManager.Generation_utils
                             if ((workDays - day + 1) * perDay < lessonsLeft) return;
                         }
 
+                        //redo later
                         int lessonsPossible = 0;
-                        for (int i = 0; i < g.dayLims.Count; i++)
+                        for (int i = 2; i < g.dayLims.Count; i++)
                         {
                             lessonsPossible += Math.Min(g.dayLims[i].cnt, g.weekLims[i].cnt);
                         }
@@ -262,7 +320,7 @@ namespace SchoolManager.Generation_utils
             }
         }
 
-        private void initGroupTeacherMatches()
+        private void initGroupTeacherInfo()
         {
             groupTeacherMatches = new List<int>[groups.Count, teachers.Count];
             for (int g = 0; g < groups.Count; g++)
@@ -277,17 +335,6 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
-        }
-
-        private void initGeneration()
-        {
-            usedGroup = new bool[workDays + 1, maxLessons + 1, teachers.Count];
-            for (int day = 1; day <= workDays; day++)
-                for (int lesson = 1; lesson <= maxLessons; lesson++)
-                    for (int groupInd = 0; groupInd < groups.Count; groupInd++)
-                        usedGroup[day, lesson, groupInd] = false;
-
-            initGroupTeacherMatches();
 
             teacherFreeLesons = new int[teachers.Count];
             for (int t = 0; t < teachers.Count; t++) teacherFreeLesons[t] = workDays * maxLessons;
@@ -300,14 +347,36 @@ namespace SchoolManager.Generation_utils
                         teacherFreeLesons[t] -= groups[g].weekLims[groups[g].subjectWeekSelf[s]].cnt;
                 }
             }
+        }
 
-            for(int g = 0;g<groups.Count;g++)
-            {
-                groups[g].subject2Teacher.OrderByDescending(x => groupTeacherMatches[g, teachers.FindIndex(y => y.name == x.Item2.name)]);
-                Console.WriteLine(string.Join(" ", groups[g].subject2Teacher.Select(x => x.Item2.name)));
-            }
+        private void orderTeachers()
+        {
+            List<int> help = new List<int>();//{ 5, 0, 2, 7, 6, 4, 3, 9, 1, 8, 10, 11, 12 };
+            for (int t = 0; t < teachers.Count; t++) help.Add(t);
 
-            initGroupTeacherMatches();
+            for (int t = 0; t < teachers.Count; t++) Console.WriteLine(teacherFreeLesons[t]);
+            help = help.OrderBy(x => teacherFreeLesons[x]).ToList();
+
+            List<Teacher> teachersCpy = new List<Teacher>();
+            foreach (Teacher t in teachers) teachersCpy.Add(t);
+
+            teachers.Clear();
+            foreach (int ind in help) teachers.Add(teachersCpy[ind]);
+
+            Console.WriteLine(string.Join(" ", teachers.Select(x => x.name)));
+        }
+
+        private void initGeneration()
+        {
+            usedGroup = new bool[workDays + 1, maxLessons + 1, teachers.Count];
+            for (int day = 1; day <= workDays; day++)
+                for (int lesson = 1; lesson <= maxLessons; lesson++)
+                    for (int groupInd = 0; groupInd < groups.Count; groupInd++)
+                        usedGroup[day, lesson, groupInd] = false;
+
+            initGroupTeacherInfo();
+            orderTeachers();
+            initGroupTeacherInfo();
 
             dayState = new List<Group>[workDays + 1];
 
