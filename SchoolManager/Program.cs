@@ -36,7 +36,7 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11b());
 
             //Shuffle(groups);
-            ScheduleGenerator1 sg = new ScheduleGenerator1(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);
+            ScheduleGenerator2 sg = new ScheduleGenerator2(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -45,7 +45,7 @@ namespace SchoolManager
             //sg.printSchedule(schedule);
 
             sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");
 
             while (true) ;
         }

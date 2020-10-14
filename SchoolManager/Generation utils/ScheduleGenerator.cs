@@ -3,6 +3,7 @@ using SchoolManager.School_Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -66,14 +67,33 @@ namespace SchoolManager.Generation_utils
                     if (g.getBottleneck(i) < g.weekLims[g.subjectWeekSelf[i]].cnt) return false;
                 }
             }
-            
 
             cntGenerated++;
             if (cntGenerated == 1) Console.WriteLine("found you!");
             if (cntGenerated % ((int)1e4) == 0) Console.WriteLine(cntGenerated);
 
+            List<DaySchedule> state = new List<DaySchedule>();
+            foreach(Group g in dayState[workDays])
+            {
+                DaySchedule curr = new DaySchedule();
+                
+                curr.g = g;
+                curr.curriculum = new List<Tuple<Subject, int>>();
+                foreach(var x in g.weekLims)
+                {
+                    var help = g.subject2Teacher.FirstOrDefault(y => y.Item1.name == x.g.name);
+                    
+                    if (help == null) continue;
+                    Subject s = help.Item1;
+
+                    curr.curriculum.Add(Tuple.Create(s, x.cnt));
+                }
+
+                state.Add(curr);
+            }
+
             sw.Restart();
-            ScheduleCompleter sc = new ScheduleCompleter(dayState[workDays], teachers, maxLessons);
+            ScheduleCompleter sc = new ScheduleCompleter(state, teachers, maxLessons);
             string[,] lastDay = sc.gen();
             sw.Stop();
 
