@@ -345,5 +345,101 @@ namespace SchoolManager
             Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
             return g;
         }
+
+        public static Group _11v()
+        {
+            var dayLims = new List<Tuple<LimitationGroup, int>>()
+            {
+                Tuple.Create(limitationGroups[0], 2),
+                Tuple.Create(limitationGroups[1], 2),
+
+                Tuple.Create(limitationGroups[2], 2),
+                Tuple.Create(limitationGroups[3], 1),
+                Tuple.Create(limitationGroups[4], 1),
+                Tuple.Create(limitationGroups[5], 2),
+                Tuple.Create(limitationGroups[6], 2),
+                Tuple.Create(limitationGroups[7], 1),
+                Tuple.Create(limitationGroups[8], 1),
+                Tuple.Create(limitationGroups[9], 2),
+            };
+
+            var weekLims = new List<Tuple<LimitationGroup, int>>()
+            {
+                Tuple.Create(limitationGroups[0], 6969),
+                Tuple.Create(limitationGroups[1], 6969),
+
+                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[3], 2),
+                Tuple.Create(limitationGroups[4], 2),
+                Tuple.Create(limitationGroups[5], 4),
+                Tuple.Create(limitationGroups[6], 4),
+                Tuple.Create(limitationGroups[7], 2),
+                Tuple.Create(limitationGroups[8], 2),
+                Tuple.Create(limitationGroups[9], 3),
+            };
+
+            var subject2Teacher = new List<Tuple<Subject, Teacher>>()
+            {
+                Tuple.Create(subjects[0], teachers[0]),
+                Tuple.Create(subjects[1], teachers[3]),
+                Tuple.Create(subjects[2], teachers[1]),
+                Tuple.Create(subjects[3], teachers[7]),
+                Tuple.Create(subjects[4], teachers[6]),
+                Tuple.Create(subjects[5], teachers[10]),
+                Tuple.Create(subjects[6], teachers[11]),
+                Tuple.Create(subjects[7], teachers[12]),
+            };
+
+            Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
+            return g;
+        }
+
+        public static Group _11d()
+        {
+            var dayLims = new List<Tuple<LimitationGroup, int>>()
+            {
+                Tuple.Create(limitationGroups[0], 2),
+                Tuple.Create(limitationGroups[1], 2),
+
+                Tuple.Create(limitationGroups[2], 2),
+                Tuple.Create(limitationGroups[3], 1),
+                Tuple.Create(limitationGroups[4], 1),
+                Tuple.Create(limitationGroups[5], 2),
+                Tuple.Create(limitationGroups[6], 2),
+                Tuple.Create(limitationGroups[7], 1),
+                Tuple.Create(limitationGroups[8], 1),
+                Tuple.Create(limitationGroups[9], 2),
+            };
+
+            var weekLims = new List<Tuple<LimitationGroup, int>>()
+            {
+                Tuple.Create(limitationGroups[0], 6969),
+                Tuple.Create(limitationGroups[1], 6969),
+
+                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[3], 2),
+                Tuple.Create(limitationGroups[4], 2),
+                Tuple.Create(limitationGroups[5], 4),
+                Tuple.Create(limitationGroups[6], 4),
+                Tuple.Create(limitationGroups[7], 2),
+                Tuple.Create(limitationGroups[8], 2),
+                Tuple.Create(limitationGroups[9], 3),
+            };
+
+            var subject2Teacher = new List<Tuple<Subject, Teacher>>()
+            {
+                Tuple.Create(subjects[0], teachers[5]),
+                Tuple.Create(subjects[1], teachers[3]),
+                Tuple.Create(subjects[2], teachers[1]),
+                Tuple.Create(subjects[3], teachers[2]),
+                Tuple.Create(subjects[4], teachers[4]),
+                Tuple.Create(subjects[5], teachers[10]),
+                Tuple.Create(subjects[6], teachers[11]),
+                Tuple.Create(subjects[7], teachers[12]),
+            };
+
+            Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
+            return g;
+        }
     }
 }
