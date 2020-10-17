@@ -156,8 +156,8 @@ namespace SchoolManager.Generation_utils
 
             if (teacherInd==teachers.Count) 
             {
-                //cntGenerated++;
-                //if (cntGenerated % (int)1e4 == 0) Console.WriteLine(cntGenerated);
+                cntGenerated++;
+                if (cntGenerated % (int)1e5 == 0) Console.WriteLine(cntGenerated);
 
                 //return;
 
