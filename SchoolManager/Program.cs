@@ -32,10 +32,11 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._12b());
             groups.Add(PerformanceTest1._12v());
             groups.Add(PerformanceTest1._12g());
-            groups.Add(PerformanceTest1._11а());
+            groups.Add(PerformanceTest1._11а());    
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
+            groups.Add(PerformanceTest1._10a());
 
             //Shuffle(groups);
             //ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);
