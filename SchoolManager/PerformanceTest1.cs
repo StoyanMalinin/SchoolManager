@@ -59,6 +59,12 @@ namespace SchoolManager
             };
         }
 
+        //данните за това колко са максималните часове по даден LimitationGroup за седмица (weekLims)
+        //трябва да се допълват до 25
+
+        //общите LimitationGroup-и (точни, разказвателни)
+        //когато са в weekLims, трябва да бъдат сложени на голямо число, за да не пречат
+
         public static Group _12a()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
@@ -218,7 +224,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
-            };
+            };  
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
             {

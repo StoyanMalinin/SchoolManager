@@ -33,10 +33,12 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
-
+            
             //Shuffle(groups);
-            //ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);
-            ScheduleGenerator2 sg = new ScheduleGenerator2(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);
+            
+            ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за учители
+            //ScheduleGenerator2 sg = new ScheduleGenerator2(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за общи проблеми
+            
             Stopwatch sw = new Stopwatch();
             sw.Start();
             string[,,] schedule = sg.generate();
