@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\SchoolManager.csproj",
+      "projectUniqueName": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
       "projectName": "SchoolManager",
-      "projectPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\SchoolManager.csproj",
+      "projectPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
       "packagesPath": "C:\\Users\\Stoyan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\school manager\\SchoolManager\\obj\\",
+      "outputPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
