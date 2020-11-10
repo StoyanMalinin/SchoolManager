@@ -36,6 +36,12 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
+            groups.Add(PerformanceTest1._10a());
+
+            //Shuffle(groups);
+
+            //List<GroupUnion> groupUnions = new List<GroupUnion>();
+            //groupUnions.Add(new GroupUnion(new List<Group> { }));
 
             //Shuffle(groups);
             //ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);

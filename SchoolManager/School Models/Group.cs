@@ -134,15 +134,15 @@ namespace SchoolManager.School_Models
             return bottleneck;
         }
 
-        public bool checkSubject(int s)
+        public bool checkSubject(int s, int cnt = 1)
         {
             foreach(int ind in subjectDayDependees[s])
             {
-                if (dayLims[ind].cnt == 0) return false;
+                if (dayLims[ind].cnt < cnt) return false;
             }
             foreach (int ind in subjectWeekDependees[s])
             {
-                if (weekLims[ind].cnt == 0) return false;
+                if (weekLims[ind].cnt < cnt) return false;
             }
 
             return true;
