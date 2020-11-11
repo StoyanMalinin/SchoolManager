@@ -38,12 +38,13 @@ namespace SchoolManager
             
             //Shuffle(groups);
             
-            ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за учители
+            //ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за учители
             //ScheduleGenerator2 sg = new ScheduleGenerator2(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за общи проблеми
+            ScheduleGenerator3 sg = new ScheduleGenerator3(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy);//за общи проблеми
             
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            string[,,] schedule = sg.generate();
+            sg.generate();
             //sg.printSchedule(schedule);
             sw.Stop();
             Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");

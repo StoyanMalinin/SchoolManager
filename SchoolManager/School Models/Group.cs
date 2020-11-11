@@ -123,6 +123,18 @@ namespace SchoolManager.School_Models
             return output;
         }
 
+        public override bool Equals(object obj)
+        {
+            Console.WriteLine("a de");
+
+            if (obj.GetType()==typeof(Group))
+            {
+                return name.Equals((obj as Group).name);
+            }
+
+            return false;
+        }
+
         public int getBottleneck(int s)
         {
             int bottleneck = int.MaxValue;

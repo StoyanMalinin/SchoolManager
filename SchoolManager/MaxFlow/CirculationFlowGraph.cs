@@ -32,13 +32,13 @@ namespace SchoolManager.MaxFlow
         }
         public CirculationFlowGraph(int n) : this()
         {
-            this.demand = new int[n + 1];
-            for (int x = 0; x <= n; x++) demand[x] = 0;
+            this.demand = new int[n + 5];
+            for (int x = 0; x < demand.Length; x++) demand[x] = 0;
         }
-        
-        public void addDemand(int x, int change)
+       
+        public void setDemand(int x, int newDemand)
         {
-            demand[x] += change;
+            demand[x] = newDemand;
         }
 
         public void addEdge(int s, int t, int l, int c)
@@ -59,6 +59,8 @@ namespace SchoolManager.MaxFlow
                 e.c -= e.l;
                 e.l = 0;
             }
+
+            
 
             return 69;
         }

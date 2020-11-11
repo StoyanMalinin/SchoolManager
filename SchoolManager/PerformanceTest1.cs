@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
-using SchoolManager.School_Models.Higharcy;
+using SchoolManager.School_Models.Higharchy;
 
 namespace SchoolManager
 {
@@ -14,7 +14,7 @@ namespace SchoolManager
         public static List<LimitationGroup> limitationGroups;
         public static List<Teacher> teachers;
 
-        public static LimitationTreeNode higharcy = new LimitationTreeNode("root", null);
+        public static LimitationTreeNode higharchy = new LimitationTreeNode("root", null);
 
         public static void init()
         {
@@ -62,19 +62,19 @@ namespace SchoolManager
                 new Teacher("kongalov", new List<Subject>(){  }),//13
             };
 
-            higharcy.addChild(new LimitationTreeNode(limitationGroups[0]));
-            higharcy.addChild(new LimitationTreeNode(limitationGroups[1]));
-            higharcy.addChild(new SubjectTreeNode(subjects[3]));
-            higharcy.addChild(new SubjectTreeNode(subjects[4]));
-            higharcy.addChild(new SubjectTreeNode(subjects[5]));
-            higharcy.addChild(new SubjectTreeNode(subjects[6]));
-            higharcy.addChild(new SubjectTreeNode(subjects[7]));
+            higharchy.addChild(new LimitationTreeNode(limitationGroups[0]));
+            higharchy.addChild(new LimitationTreeNode(limitationGroups[1]));
+            higharchy.addChild(new SubjectTreeNode(subjects[3]));
+            higharchy.addChild(new SubjectTreeNode(subjects[4]));
+            higharchy.addChild(new SubjectTreeNode(subjects[5]));
+            higharchy.addChild(new SubjectTreeNode(subjects[6]));
+            higharchy.addChild(new SubjectTreeNode(subjects[7]));
             
-            (higharcy.children[0] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[0]));
-            (higharcy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[1]));
-            (higharcy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[2]));
+            (higharchy.children[0] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[0]));
+            (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[1]));
+            (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[2]));
 
-            higharcy.printTree();
+            higharchy.printTree();
         }
 
         //данните за това колко са максималните часове по даден LimitationGroup за седмица (weekLims)

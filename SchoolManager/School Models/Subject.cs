@@ -15,5 +15,15 @@ namespace SchoolManager.School_Models
             this.name = name;
             this.limGroups = limGroups;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(Subject))
+            {
+                return name.Equals((obj as Subject).name);
+            }
+
+            return false;
+        }
     }
 }
