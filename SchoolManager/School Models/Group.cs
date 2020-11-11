@@ -85,6 +85,17 @@ namespace SchoolManager.School_Models
             }
         }
 
+        public int findSubject(Subject s)
+        {
+            for(int i = 0;i<subject2Teacher.Count;i++)
+            {
+                if (subject2Teacher[i].Item1.Equals(s) == true) 
+                    return i;
+            }
+
+            return -1;
+        }
+
         public Group CloneFull()
         {
             Group output = new Group();

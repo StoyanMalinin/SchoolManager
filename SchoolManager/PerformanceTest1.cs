@@ -415,7 +415,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[7], teachers[12]),
             };
 
-            Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
+            Group g = new Group("11v", dayLims, weekLims, subject2Teacher);
             return g;
         }
 
@@ -463,7 +463,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[7], teachers[13]),
             };
 
-            Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
+            Group g = new Group("10a", dayLims, weekLims, subject2Teacher);
             return g;
         }
 
@@ -511,7 +511,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[7], teachers[12]),
             };
 
-            Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
+            Group g = new Group("11d", dayLims, weekLims, subject2Teacher);
             return g;
         }
     }

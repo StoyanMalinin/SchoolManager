@@ -36,14 +36,20 @@ namespace SchoolManager.MaxFlow
             for (int x = 0; x < demand.Length; x++) demand[x] = 0;
         }
        
+        public void reset()
+        {
+            this.edges = new List<CirculationEdge>();
+            for (int x = 0; x < demand.Length; x++) demand[x] = 0;
+        }
+
         public void setDemand(int x, int newDemand)
         {
             demand[x] = newDemand;
         }
 
-        public void addEdge(int s, int t, int l, int c)
+        public void addEdge(int u, int v, int l, int c)
         {
-            edges.Add(new CirculationEdge(s, t, l, c));
+            edges.Add(new CirculationEdge(u, v, l, c));
         }
 
         public int eval()
