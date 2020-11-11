@@ -21,10 +21,12 @@ namespace SchoolManager
                 list[n] = value;
             }
         }
+
         static void Main(string[] args)
         {
             PerformanceTest1.init();
             List<Group> groups = new List<Group>();
+            
             groups.Add(PerformanceTest1._12a());
             groups.Add(PerformanceTest1._12b());
             groups.Add(PerformanceTest1._12v());

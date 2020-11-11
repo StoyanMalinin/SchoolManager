@@ -8,9 +8,9 @@ namespace SchoolManager.MaxFlow
 {
     class Edge
     {
-        public int u { get; set; }
-        public int v { get; set; }
-        public int cap { get; set; }
+        public int u;
+        public int v;
+        public int cap;
 
         public Edge() { }
         public Edge(int u, int v, int cap)
