@@ -30,6 +30,7 @@ namespace SchoolManager.School_Models.Higharchy
             foreach(TreeNode x in other.children)
             {
                 this.children.Add(x.Clone());
+                this.children[this.children.Count - 1].parent = this;
             }
         }
 

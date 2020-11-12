@@ -32,8 +32,6 @@ namespace SchoolManager.Generation_utils
         private int[,] groupSubject2Teacher;
         private List<int>[,] teacherGroup2Subjects; 
 
-
-
         int cntGenerated = 0;
 
         private bool checkFailed(int day, int groupInd)

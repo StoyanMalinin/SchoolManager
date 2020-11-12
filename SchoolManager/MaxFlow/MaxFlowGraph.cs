@@ -43,7 +43,7 @@ namespace SchoolManager.MaxFlow
             this.sink = t;
             this.source = s;
 
-            for (int i = 0; i <= n; i++)
+            for (int i = 0; i <= n+5; i++)
             {
                 this.adj.Add(new List<int>());
                 this.startInd.Add(0);
@@ -57,13 +57,20 @@ namespace SchoolManager.MaxFlow
             sink = t;
         }
 
-        public void addEdge(int u, int v, int cap)
+        public int addEdge(int u, int v, int cap)
         {
             edges.Add(new Edge(u, v, cap));
             adj[u].Add(edges.Count - 1);
 
             edges.Add(new Edge(v, u, 0));
             adj[v].Add(edges.Count - 1);
+
+            return edges.Count - 2;
+        }
+
+        public int getEdge(int ind)
+        {
+            return edges[ind^1].cap;
         }
 
         public void bfs(int x)
