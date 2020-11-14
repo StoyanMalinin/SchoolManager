@@ -322,7 +322,7 @@ namespace SchoolManager.Generation_utils
                 for (int t = 0; t < teachers.Count; t++)
                 {
                     foreach (int s in groupTeacherMatches[g, t])
-                        teacherFreeLesons[t] -= groups[g].weekLims[groups[g].subjectWeekSelf[s]].cnt;
+                        teacherFreeLesons[t] -= groups[g].getSubjectWeekLim(s);
                 }
             }
         }

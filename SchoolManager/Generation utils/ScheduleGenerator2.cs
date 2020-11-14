@@ -58,11 +58,11 @@ namespace SchoolManager.Generation_utils
                     if (groups[g].subject2Teacher[s].Item2 == null) continue;
 
                     int teacherInd = groupSubject2Teacher[g, s];
-                    int lessonsLeft = ds[day][g].g.weekLims[ds[day][g].g.subjectWeekSelf[s]].cnt;
+                    int lessonsLeft = ds[day][g].g.getSubjectWeekLim(s);
 
                     for (int d = day; d <= workDays; d++)
                     {
-                        int rm = Math.Min(ds[d][g].g.dayLims[ds[d][g].g.subjectDaySelf[s]].cnt, teacherLeftLessons[d, teacherInd]);
+                        int rm = Math.Min(ds[d][g].g.getSubjectDayLim(s), teacherLeftLessons[d, teacherInd]);
                         rm = Math.Min(rm, groupLeftLessons[d, g]);
 
                         lessonsLeft -= rm;
@@ -81,7 +81,7 @@ namespace SchoolManager.Generation_utils
                     {
                         if (ds[day][g].g.subject2Teacher[s].Item2.name == teachers[t].name)
                         {
-                            requested += ds[day][g].g.weekLims[ds[day][g].g.subjectWeekSelf[s]].cnt;
+                            requested += ds[day][g].g.getSubjectWeekLim(s);
                         }
                     }
                 }

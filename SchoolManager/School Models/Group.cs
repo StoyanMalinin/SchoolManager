@@ -33,16 +33,16 @@ namespace SchoolManager.School_Models
     {
         public string name { get; set; }
 
-        public List<LimitationGroupPair> dayLims { get; set; }
-        public List<LimitationGroupPair> weekLims { get; set; }
-     
+        private List<LimitationGroupPair> dayLims;
+        public List<LimitationGroupPair> weekLims { get; private set; }
+
         public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
-        
+
         private List<int>[] subjectDayDependees, subjectWeekDependees;
         public int[] subjectDaySelf, subjectWeekSelf;
 
         public Group() { }
-        public Group(string name, List<Tuple<LimitationGroup, int>> dayLims, 
+        public Group(string name, List<Tuple<LimitationGroup, int>> dayLims,
                                   List<Tuple<LimitationGroup, int>> weekLims,
                                   List<Tuple<Subject, Teacher>> subject2Teacher)
         {
@@ -57,7 +57,7 @@ namespace SchoolManager.School_Models
             this.subjectDaySelf = new int[this.subject2Teacher.Count];
             this.subjectWeekSelf = new int[this.subject2Teacher.Count];
 
-            for(int i = 0;i<subject2Teacher.Count;i++)
+            for (int i = 0; i < subject2Teacher.Count; i++)
             {
                 subjectDayDependees[i] = new List<int>();
                 subjectWeekDependees[i] = new List<int>();
@@ -83,6 +83,16 @@ namespace SchoolManager.School_Models
                     }
                 }
             }
+        }
+
+        public int getSubjectDayLim(int s)
+        {
+            return dayLims[subjectDaySelf[s]].cnt;
+        }
+
+        public int getSubjectWeekLim(int s)
+        {
+            return weekLims[subjectWeekSelf[s]].cnt;
         }
 
         public int findSubject(Subject s)

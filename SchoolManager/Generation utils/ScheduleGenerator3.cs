@@ -192,7 +192,7 @@ namespace SchoolManager.Generation_utils
                     {
                         if (ds[day][g].g.subject2Teacher[s].Item2.name == teachers[t].name)
                         {
-                            requested += ds[day][g].g.weekLims[ds[day][g].g.subjectWeekSelf[s]].cnt;
+                            requested += ds[day][g].g.getSubjectWeekLim(s);
                         }
                     }
                 }
@@ -238,22 +238,22 @@ namespace SchoolManager.Generation_utils
                         if (ds[day][g].g.subject2Teacher[s].Item2 == null) return;
                         
                         int teacherInd = groupSubject2Teacher[g, s];
-                        int lessonsLeft = ds[day][g].g.weekLims[groups[g].subjectWeekSelf[s]].cnt;
+                        int lessonsLeft = ds[day][g].g.getSubjectWeekLim(s);
 
                         Console.WriteLine($"{groups[g].subject2Teacher[s].Item1.name} -> {lessonsLeft}");
                         for (int d = day+1; d <= workDays; d++)
                         {
-                            int rm = Math.Min(ds[day][g].g.dayLims[ds[day][g].g.subjectDaySelf[s]].cnt, teacherLeftLessons[d, teacherInd]);
+                            int rm = Math.Min(ds[day][g].g.getSubjectDayLim(s), teacherLeftLessons[d, teacherInd]);
                             rm = Math.Min(rm, groupLeftLessons[d, g]);
 
-                            Console.WriteLine($"{ds[day][g].g.dayLims[ds[day][g].g.subjectDaySelf[s]].cnt} {teacherLeftLessons[d, teacherInd]}");
+                            Console.WriteLine($"{ds[day][g].g.getSubjectDayLim(s)} {teacherLeftLessons[d, teacherInd]}");
 
                             lessonsLeft -= rm;
                         }
                         Console.WriteLine(lessonsLeft);
 
-                        int subjectLim = Math.Min(ds[day][g].g.dayLims[ds[day][g].g.subjectDaySelf[s]].cnt,
-                                                  ds[day][g].g.weekLims[ds[day][g].g.subjectWeekSelf[s]].cnt);
+                        int subjectLim = Math.Min(ds[day][g].g.getSubjectDayLim(s),
+                                                  ds[day][g].g.getSubjectWeekLim(s));
                         groupSubjectEdge[g, s] = G.addEdge(x.nodeCode, x.parent.nodeCode, 
                                                            Math.Max(0, lessonsLeft),
                                                            subjectLim);
@@ -305,12 +305,6 @@ namespace SchoolManager.Generation_utils
         {
             for(int day = 1;day<=workDays;day++)
             {
-                for(int g = 0;g<groups.Count;g++)
-                {
-                    for (int i = 0; i < ds[day][g].g.dayLims.Count;i++)
-                        if (ds[day][g].g.dayLims[i].cnt < 0) return false;
-                }
-
                 for (int t = 0; t < teachers.Count; t++)
                     if (teacherLeftLessons[day, t] < 0)
                         return false;
@@ -319,7 +313,13 @@ namespace SchoolManager.Generation_utils
             {
                 for(int s = 0;s<ds[1][g].g.subject2Teacher.Count;s++)
                 {
-                    if (ds[1][g].g.weekLims[ds[1][g].g.subjectWeekSelf[s]].cnt != 0)
+                    if (ds[1][g].g.getSubjectWeekLim(s) != 0)
+                        return false;
+                }
+
+                for (int s = 0; s < ds[1][g].g.subject2Teacher.Count; s++)
+                {
+                    if (ds[1][g].g.getSubjectDayLim(s) < 0)
                         return false;
                 }
             }
@@ -339,6 +339,7 @@ namespace SchoolManager.Generation_utils
 
             bool res = runDiagnostics();
             if (res == true) Console.WriteLine("Kein problem!");
+            else Console.WriteLine("Es gibt ein problem!");
         }
     }
 }

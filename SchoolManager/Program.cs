@@ -35,6 +35,7 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
+            //groups.Add(PerformanceTest1._10a());
             
             //Shuffle(groups);
             

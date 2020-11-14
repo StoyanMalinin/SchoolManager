@@ -64,7 +64,7 @@ namespace SchoolManager.Generation_utils
             {
                 for (int i = 0; i < g.subject2Teacher.Count; i++)
                 {
-                    if (g.getBottleneck(i) < g.weekLims[g.subjectWeekSelf[i]].cnt) return false;
+                    if (g.getBottleneck(i) < g.getSubjectWeekLim(i)) return false;
                 }
             }
 
@@ -177,6 +177,7 @@ namespace SchoolManager.Generation_utils
                 teacherInd = 0; 
                 lesson++;
 
+                /*
                 if(lesson!=maxLessons+1)
                 {
                     foreach (Group g in dayState[day])
@@ -189,9 +190,12 @@ namespace SchoolManager.Generation_utils
                         if (lessonsPossible < maxLessons - lesson + 1) return;
                     }
                 }
+                */
                 
                 //if (lesson != maxLessons + 1 && checkLesson(day, lesson) == false) return;
             }
+
+            /*
             if(lesson==maxLessons+1)
             {
                 /*
@@ -204,6 +208,7 @@ namespace SchoolManager.Generation_utils
                 lesson = 1; 
                 day++;
 
+                /*
                 if (day<=workDays)
                 {
                     //redo later
@@ -211,8 +216,8 @@ namespace SchoolManager.Generation_utils
                     {
                         for (int s = 0;s < g.subject2Teacher.Count;s++)
                         {
-                            int perDay = g.dayLims[g.subjectDaySelf[s]].cnt;
-                            int lessonsLeft = g.weekLims[g.subjectWeekSelf[s]].cnt;
+                            int perDay = g.getSubjectDayLim(s);
+                            int lessonsLeft = g.getSubjectWeekLim(s);
 
                             if ((workDays - day + 1) * perDay < lessonsLeft) return;
                         }
@@ -244,6 +249,7 @@ namespace SchoolManager.Generation_utils
                         if (requested > (workDays - day + 1) * maxLessons) return;
                     }
                 }
+                
             }
             if (day == workDays)
             {
@@ -264,6 +270,7 @@ namespace SchoolManager.Generation_utils
 
                 return;
             }
+            */
 
             List<int> groupInds = new List<int>();
             for (int i = 0; i < groups.Count; i++) groupInds.Add(i);
@@ -364,7 +371,7 @@ namespace SchoolManager.Generation_utils
                 for (int t = 0; t < teachers.Count; t++)
                 {
                     foreach (int s in groupTeacherMatches[g, t])
-                        teacherFreeLesons[t] -= groups[g].weekLims[groups[g].subjectWeekSelf[s]].cnt;
+                        teacherFreeLesons[t] -= groups[g].getSubjectWeekLim(s);
                 }
             }
         }
