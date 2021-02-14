@@ -302,7 +302,7 @@ namespace SchoolManager.Generation_utils
                 //Console.WriteLine(string.Join(" ", teacherInds.Select(t => teachers[t].name)));    
             }
 
-            ScheduleCompleter sc = new ScheduleCompleter(dayState[day], teachers, maxLessons);
+            ScheduleCompleter1 sc = new ScheduleCompleter1(dayState[day], teachers, maxLessons);
             DaySchedule ds = sc.gen();
             ds.print();
         }

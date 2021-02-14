@@ -86,6 +86,16 @@ namespace SchoolManager.Generation_utils
             {
                 if (ind == l.Count)
                 {
+                    for(int i = 0;i<curr.Count;i++)
+                    {
+                        bool diff = false;
+                        for(int j = i+1;j<curr.Count;j++)
+                        {
+                            if (curr[i].Item1 != curr[j].Item1) diff = true;
+                            if (curr[i].Item1 == curr[j].Item1 && diff == true) return;
+                        }
+                    }
+
                     cnt++;
 
                     List<Tuple<int, Subject>> cpy = new List<Tuple<int, Subject>>(curr.Select(x => x).ToList());
