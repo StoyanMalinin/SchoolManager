@@ -20,11 +20,13 @@ namespace SchoolManager.Generation_utils
         class TeacherList : IEquatable<TeacherList>
         {
             public int id { get; set; }
+            public bool isGood { get; set; }
             public List<Tuple<int, Subject>> l { get; set; }
 
             public TeacherList() { }
-            public TeacherList(int id, List<Tuple <int, Subject>> l)
+            public TeacherList(int id, List<Tuple <int, Subject>> l, bool isGood)
             {
+                this.isGood = isGood;
                 this.id = id;
                 this.l = l;
             }
@@ -86,20 +88,25 @@ namespace SchoolManager.Generation_utils
             {
                 if (ind == l.Count)
                 {
+                    bool isGood = true;
                     for(int i = 0;i<curr.Count;i++)
                     {
                         bool diff = false;
                         for(int j = i+1;j<curr.Count;j++)
                         {
                             if (curr[i].Item1 != curr[j].Item1) diff = true;
-                            if (curr[i].Item1 == curr[j].Item1 && diff == true) return;
+                            if (curr[i].Item1 == curr[j].Item1 && diff == true)
+                            {
+                                isGood = false;
+                                break;
+                            }
                         }
                     }
 
                     cnt++;
 
                     List<Tuple<int, Subject>> cpy = new List<Tuple<int, Subject>>(curr.Select(x => x).ToList());
-                    ans.Add(new TeacherList(cnt, cpy));
+                    ans.Add(new TeacherList(cnt, cpy, isGood));
 
                     return;
                 }
@@ -123,7 +130,7 @@ namespace SchoolManager.Generation_utils
             return ans;
         }
 
-        private void rec(int g)
+        private void rec(int g, bool onlyConsequtive)
         {
             if (output != null) return;
             if (g == state.Count)
@@ -135,6 +142,8 @@ namespace SchoolManager.Generation_utils
 
             foreach (TeacherList tl in teacherPermList[g])
             {
+                if (onlyConsequtive == true && tl.isGood == false) continue;
+
                 bool fail = false;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
                 {
@@ -150,7 +159,7 @@ namespace SchoolManager.Generation_utils
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
                     lessonTeacher[lesson, tl.l[lesson].Item1] = true;
 
-                rec(g + 1);
+                rec(g + 1, onlyConsequtive);
 
                 solution[g] = null;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
@@ -158,7 +167,7 @@ namespace SchoolManager.Generation_utils
             }
         }
 
-        public DaySchedule gen()
+        public DaySchedule gen(bool onlyConsequtive = false)
         {
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
@@ -193,6 +202,9 @@ namespace SchoolManager.Generation_utils
                     for (int iter = 0; iter < cnt; iter++)
                         teacherList[g].Add(Tuple.Create(t, state[g].subject2Teacher[s].Item1));
                 }
+
+                //Console.Write($"{g}: ");
+                //Console.WriteLine(string.Join(" ", teacherList[g].Select(x => x.Item1).ToList()));
             }
 
             for (int g = 0; g < state.Count; g++)
@@ -203,7 +215,7 @@ namespace SchoolManager.Generation_utils
                 //foreach (var l in teacherPermList[g]) Console.WriteLine(string.Join(" ", l.l));
             }
 
-            rec(0);
+            rec(0, onlyConsequtive);
             return output;
         }
     }
