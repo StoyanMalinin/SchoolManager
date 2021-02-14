@@ -1,4 +1,5 @@
 ﻿using SchoolManager.MaxFlow;
+using SchoolManager.ScheduleUtils;
 using SchoolManager.School_Models;
 using SchoolManager.School_Models.Higharchy;
 using System;
@@ -39,7 +40,7 @@ namespace SchoolManager.Generation_utils
             groupSubjectNode = new int[groups.Count, subjects.Count];
         }
 
-        private List<DaySchedule>[] ds;
+        private List<Group>[] dayState;
 
         private int[] teacherNode;
         private int allTeachersNode;
@@ -77,9 +78,9 @@ namespace SchoolManager.Generation_utils
                 groupHigharchy[g] = higharchy.Clone();
                 groupHigharchy[g].encodeTree(ref node);
 
-                Console.WriteLine();
-                Console.WriteLine($"Group: {groups[g].name}");
-                groupHigharchy[g].printTree();
+                //Console.WriteLine();
+                //Console.WriteLine($"Group: {groups[g].name}");
+                //groupHigharchy[g].printTree();
             }
             for(int g = 0;g<groups.Count;g++)
             {
@@ -88,7 +89,7 @@ namespace SchoolManager.Generation_utils
                     if(x.GetType()==typeof(SubjectTreeNode))
                     {
                         groupSubjectNode[g, groups[g].findSubject((x as SubjectTreeNode).s)] = x.nodeCode;
-                        Console.WriteLine($"{g} -> [{groups[g].findSubject((x as SubjectTreeNode).s)} <=> {x.nodeCode}]");
+                        //Console.WriteLine($"{g} -> [{groups[g].findSubject((x as SubjectTreeNode).s)} <=> {x.nodeCode}]");
 
                         return;
                     }
@@ -120,10 +121,10 @@ namespace SchoolManager.Generation_utils
                 for (int g = 0; g < groups.Count; g++)
                     groupLeftLessons[day, g] = maxLessons;
 
-            ds = new List<DaySchedule>[workDays + 1];
-            ds[1] = groups.Select(g => new DaySchedule(g.CloneFull())).ToList();
+            dayState = new List<Group>[workDays + 1];
+            dayState[1] = groups.Select(g => g.CloneFull()).ToList();
             for (int day = 2; day <= workDays; day++)
-                ds[day] = ds[1].Select(x => new DaySchedule(x.g.ClonePartial(x.g.weekLims))).ToList();
+                dayState[day] = dayState[1].Select(g => g.ClonePartial(g.weekLims)).ToList();
 
             groupSubject2Teacher = new int[groups.Count, subjects.Count];
             for (int g = 0; g < groups.Count; g++)
@@ -162,7 +163,7 @@ namespace SchoolManager.Generation_utils
         {
             groupLeftLessons[d, g] -= sign;
             teacherLeftLessons[d, g] -= sign;
-            ds[d][g].g.applySubject(s, sign);
+            dayState[d][g].applySubject(s, sign);
         }
 
         private void generateDay(int day)
@@ -183,21 +184,21 @@ namespace SchoolManager.Generation_utils
             //connecting teachers to allTeachersNode
             for(int t = 0;t<teachers.Count;t++)
             {
-                Console.WriteLine($"Teacher: {teachers[t].name}");
+                //Console.WriteLine($"Teacher: {teachers[t].name}");
 
                 int requested = 0;
                 for (int g = 0; g < groups.Count; g++)
                 {
                     foreach (int s in teacherGroup2Subjects[t, g])
                     {
-                        if (ds[day][g].g.subject2Teacher[s].Item2.name == teachers[t].name)
+                        if (dayState[day][g].subject2Teacher[s].Item2.name == teachers[t].name)
                         {
-                            requested += ds[day][g].g.getSubjectWeekLim(s);
+                            requested += dayState[day][g].getSubjectWeekLim(s);
                         }
                     }
                 }
 
-                Console.WriteLine($"requested = {requested}");
+                //Console.WriteLine($"requested = {requested}");
 
                 for (int d = day+1; d <= workDays; d++)
                     requested -= teacherLeftLessons[d, t];
@@ -207,7 +208,7 @@ namespace SchoolManager.Generation_utils
                 int l = Math.Max(requested, 0);
                 int c = maxLessons;
 
-                Console.WriteLine($"lowerBound = {l}");
+                //Console.WriteLine($"lowerBound = {l}");
 
                 G.addEdge(u, v, l, c);
             }
@@ -227,33 +228,33 @@ namespace SchoolManager.Generation_utils
             //connecting the actual higharcy structures
             for(int g = 0;g<groups.Count;g++)
             {
-                Console.WriteLine();
-                Console.WriteLine($"{groups[g].name}");
+                //Console.WriteLine();
+                //Console.WriteLine($"{groups[g].name}");
 
                 void dfs(TreeNode x)
                 {
                     if(x.GetType()==typeof(SubjectTreeNode))
                     {
-                        int s = ds[day][g].g.findSubject((x as SubjectTreeNode).s);
-                        if (ds[day][g].g.subject2Teacher[s].Item2 == null) return;
+                        int s = dayState[day][g].findSubject((x as SubjectTreeNode).s);
+                        if (dayState[day][g].subject2Teacher[s].Item2 == null) return;
                         
                         int teacherInd = groupSubject2Teacher[g, s];
-                        int lessonsLeft = ds[day][g].g.getSubjectWeekLim(s);
+                        int lessonsLeft = dayState[day][g].getSubjectWeekLim(s);
 
-                        Console.WriteLine($"{groups[g].subject2Teacher[s].Item1.name} -> {lessonsLeft}");
+                        //Console.WriteLine($"{groups[g].subject2Teacher[s].Item1.name} -> {lessonsLeft}");
                         for (int d = day+1; d <= workDays; d++)
                         {
-                            int rm = Math.Min(ds[day][g].g.getSubjectDayLim(s), teacherLeftLessons[d, teacherInd]);
+                            int rm = Math.Min(dayState[day][g].getSubjectDayLim(s), teacherLeftLessons[d, teacherInd]);
                             rm = Math.Min(rm, groupLeftLessons[d, g]);
 
-                            Console.WriteLine($"{ds[day][g].g.getSubjectDayLim(s)} {teacherLeftLessons[d, teacherInd]}");
+                            //Console.WriteLine($"{dayState[day][g].getSubjectDayLim(s)} {teacherLeftLessons[d, teacherInd]}");
 
                             lessonsLeft -= rm;
                         }
-                        Console.WriteLine(lessonsLeft);
+                        //Console.WriteLine(lessonsLeft);
 
-                        int subjectLim = Math.Min(ds[day][g].g.getSubjectDayLim(s),
-                                                  ds[day][g].g.getSubjectWeekLim(s));
+                        int subjectLim = Math.Min(dayState[day][g].getSubjectDayLim(s),
+                                                  dayState[day][g].getSubjectWeekLim(s));
                         groupSubjectEdge[g, s] = G.addEdge(x.nodeCode, x.parent.nodeCode, 
                                                            Math.Max(0, lessonsLeft),
                                                            subjectLim);
@@ -279,11 +280,13 @@ namespace SchoolManager.Generation_utils
             }
 
             G.eval();
+
             for(int g = 0;g<groups.Count;g++)
             {
                 //for (int s = 0; s < groups[g].subject2Teacher.Count; s++)
                 //    Console.WriteLine($"{groups[g].subject2Teacher[s].Item1.name} {G.getEdge(groupSubjectEdge[g, s])}");
 
+                
                 List<int> teacherInds = new List<int>();
                 for (int s = 0; s < groups[g].subject2Teacher.Count; s++)
                 {
@@ -294,11 +297,14 @@ namespace SchoolManager.Generation_utils
                     }
                 }
 
-                Console.Write($"{groups[g].name} => ");
-                Console.WriteLine(string.Join(" ", teacherInds.Select(t => teachers[t].name)));
+                
+                //Console.Write($"{groups[g].name} => ");
+                //Console.WriteLine(string.Join(" ", teacherInds.Select(t => teachers[t].name)));    
             }
 
-            
+            ScheduleCompleter sc = new ScheduleCompleter(dayState[day], teachers, maxLessons);
+            DaySchedule ds = sc.gen();
+            ds.print();
         }
 
         public bool runDiagnostics()
@@ -311,16 +317,19 @@ namespace SchoolManager.Generation_utils
             }
             for (int g = 0; g < groups.Count; g++)
             {
-                for(int s = 0;s<ds[1][g].g.subject2Teacher.Count;s++)
+                for(int s = 0;s<dayState[1][g].subject2Teacher.Count;s++)
                 {
-                    if (ds[1][g].g.getSubjectWeekLim(s) != 0)
+                    if (dayState[1][g].getSubjectWeekLim(s) != 0)
                         return false;
                 }
 
-                for (int s = 0; s < ds[1][g].g.subject2Teacher.Count; s++)
+                for (int s = 0; s < dayState[1][g].subject2Teacher.Count; s++)
                 {
-                    if (ds[1][g].g.getSubjectDayLim(s) < 0)
-                        return false;
+                    for(int day = 1;day<=workDays;day++)
+                    {
+                        if (dayState[day][g].getSubjectDayLim(s) < 0)
+                            return false;
+                    }   
                 }
             }
 

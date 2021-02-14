@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj": {}
+    "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti proekta chovek\\SchoolManager\\SchoolManager.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj": {
+    "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti proekta chovek\\SchoolManager\\SchoolManager.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
+        "projectUniqueName": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti proekta chovek\\SchoolManager\\SchoolManager.csproj",
         "projectName": "SchoolManager",
-        "projectPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\SchoolManager.csproj",
+        "projectPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti proekta chovek\\SchoolManager\\SchoolManager.csproj",
         "packagesPath": "C:\\Users\\Stoyan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti golemite proekti brat\\pak skul meniger\\SchoolManager\\SchoolManager\\obj\\",
+        "outputPath": "C:\\Users\\Stoyan\\Desktop\\Stoyan\\Work\\bahti proekta chovek\\SchoolManager\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -29,6 +29,7 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {}
           }
         },
@@ -40,6 +41,7 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "imports": [
             "net461",
             "net462",
@@ -55,7 +57,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

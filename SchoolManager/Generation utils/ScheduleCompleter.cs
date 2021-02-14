@@ -10,6 +10,7 @@ using System.Runtime.Versioning;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualBasic.FileIO;
 using SchoolManager.MaxFlow;
+using SchoolManager.ScheduleUtils;
 using SchoolManager.School_Models;
 
 namespace SchoolManager.Generation_utils
@@ -19,10 +20,10 @@ namespace SchoolManager.Generation_utils
         class TeacherList : IEquatable<TeacherList>
         {
             public int id { get; set; }
-            public List<int> l { get; set; }
+            public List<Tuple<int, Subject>> l { get; set; }
 
             public TeacherList() { }
-            public TeacherList(int id, List<int> l)
+            public TeacherList(int id, List<Tuple <int, Subject>> l)
             {
                 this.id = id;
                 this.l = l;
@@ -33,9 +34,9 @@ namespace SchoolManager.Generation_utils
                 long h = 0;
                 long key = 1009, mod = (long)1e9 + 7;
 
-                foreach (int x in l)
+                foreach (var x in l)
                 {
-                    h = (h * key + x) % mod;
+                    h = (h * key + x.Item1) % mod;
                 }
 
                 return (int)h;
@@ -54,27 +55,27 @@ namespace SchoolManager.Generation_utils
 
         private int maxLessons;
 
-        private List<DaySchedule> state;
+        private List<Group> state;
         private List<Teacher> teachers;
 
         public ScheduleCompleter() { }
-        public ScheduleCompleter(List<DaySchedule> state, List<Teacher> teachers, int maxLessons)
+        public ScheduleCompleter(List<Group> state, List<Teacher> teachers, int maxLessons)
         {
             this.maxLessons = maxLessons;
             this.teachers = teachers;
             this.state = state;
         }
 
-        private string[,] output = null;
+        private DaySchedule output = null;
         private bool[,] lessonTeacher;
-        private List<int>[] solution;
+        private List<Tuple<int, Subject>>[] solution;
 
-        private List<int>[] teacherList;
+        private List<Tuple <int, Subject>>[] teacherList;
         private HashSet<TeacherList>[] teacherPermList;
 
-        private HashSet<TeacherList> genPerms(List<int> l)
+        private HashSet<TeacherList> genPerms(List<Tuple <int, Subject>> l)
         {
-            List<int> curr = new List<int>();
+            List<Tuple<int, Subject>> curr = new List<Tuple<int, Subject>>();
             HashSet<TeacherList> ans = new HashSet<TeacherList>();
 
             bool[] used = new bool[l.Count];
@@ -87,7 +88,7 @@ namespace SchoolManager.Generation_utils
                 {
                     cnt++;
 
-                    List<int> cpy = new List<int>(curr.Select(x => x).ToList());
+                    List<Tuple<int, Subject>> cpy = new List<Tuple<int, Subject>>(curr.Select(x => x).ToList());
                     ans.Add(new TeacherList(cnt, cpy));
 
                     return;
@@ -117,19 +118,8 @@ namespace SchoolManager.Generation_utils
             if (output != null) return;
             if (g == state.Count)
             {
-                output = new string[maxLessons + 1, teachers.Count];
-                for (int lesson = 1; lesson <= maxLessons; lesson++)
-                    for (int t = 0; t < teachers.Count; t++)
-                        output[lesson, t] = "---";
-
-                for (int i = 0; i < state.Count; i++)
-                {
-                    for (int lesson = 0; lesson < solution[i].Count; lesson++)
-                    {
-                        output[lesson + 1, solution[i][lesson]] = state[i].g.name;
-                    }
-                }
-
+                output = new DaySchedule(solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null)?null:y.Item2)).ToList()).ToList(), 
+                                         teachers, state, maxLessons);
                 return;
             }
 
@@ -138,7 +128,7 @@ namespace SchoolManager.Generation_utils
                 bool fail = false;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
                 {
-                    if (lessonTeacher[lesson, tl.l[lesson]] == true)
+                    if (lessonTeacher[lesson, tl.l[lesson].Item1] == true)
                     {
                         fail = true;
                         break;
@@ -148,23 +138,23 @@ namespace SchoolManager.Generation_utils
 
                 solution[g] = tl.l;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
-                    lessonTeacher[lesson, tl.l[lesson]] = true;
+                    lessonTeacher[lesson, tl.l[lesson].Item1] = true;
 
                 rec(g + 1);
 
                 solution[g] = null;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
-                    lessonTeacher[lesson, tl.l[lesson]] = false;
+                    lessonTeacher[lesson, tl.l[lesson].Item1] = false;
             }
         }
 
-        public string[,] gen()
+        public DaySchedule gen()
         {
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
 
-            solution = new List<int>[teachers.Count];
-            teacherList = new List<int>[state.Count];
+            solution = new List<Tuple<int, Subject>>[teachers.Count];
+            teacherList = new List<Tuple<int, Subject>>[state.Count];
             teacherPermList = new HashSet<TeacherList>[state.Count];
             lessonTeacher = new bool[maxLessons + 1, teachers.Count];
 
@@ -174,16 +164,16 @@ namespace SchoolManager.Generation_utils
 
             for (int g = 0; g < state.Count; g++)
             {
-                teacherList[g] = new List<int>();
-                for (int s = 0; s < state[g].g.subject2Teacher.Count; s++)
+                teacherList[g] = new List<Tuple<int, Subject>>();
+                for (int s = 0; s < state[g].subject2Teacher.Count; s++)
                 {
-                    int cnt = state[g].curriculum.First(x => x.Item1.name == state[g].g.subject2Teacher[s].Item1.name).Item2;
+                    int cnt = state[g].curriculum.Count(x => x.Equals(state[g].subject2Teacher[s].Item1));
                     if (cnt == 0) continue;
 
                     int t = -1;
                     for (int i = 0; i < teachers.Count; i++)
                     {
-                        if (teachers[i].name == state[g].g.subject2Teacher[s].Item2.name)
+                        if (teachers[i].name == state[g].subject2Teacher[s].Item2.name)
                         {
                             t = i;
                             break;
@@ -191,7 +181,7 @@ namespace SchoolManager.Generation_utils
                     }
 
                     for (int iter = 0; iter < cnt; iter++)
-                        teacherList[g].Add(t);
+                        teacherList[g].Add(Tuple.Create(t, state[g].subject2Teacher[s].Item1));
                 }
             }
 

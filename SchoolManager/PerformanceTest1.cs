@@ -74,7 +74,7 @@ namespace SchoolManager
             (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[1]));
             (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[2]));
 
-            higharchy.printTree();
+            //higharchy.printTree();
         }
 
         //данните за това колко са максималните часове по даден LimitationGroup за седмица (weekLims)

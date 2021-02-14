@@ -39,7 +39,9 @@ namespace SchoolManager.School_Models
         public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
 
         private List<int>[] subjectDayDependees, subjectWeekDependees;
-        public int[] subjectDaySelf, subjectWeekSelf;
+        private int[] subjectDaySelf, subjectWeekSelf;
+
+        public List<Subject> curriculum; 
 
         public Group() { }
         public Group(string name, List<Tuple<LimitationGroup, int>> dayLims,
@@ -47,6 +49,7 @@ namespace SchoolManager.School_Models
                                   List<Tuple<Subject, Teacher>> subject2Teacher)
         {
             this.name = name;
+            this.curriculum = new List<Subject>();
             this.dayLims = dayLims.Select(x => new LimitationGroupPair(x)).ToList();
             this.weekLims = weekLims.Select(x => new LimitationGroupPair(x)).ToList();
             this.subject2Teacher = subject2Teacher;
@@ -113,6 +116,7 @@ namespace SchoolManager.School_Models
             output.name = name;
             output.subject2Teacher = subject2Teacher;
 
+            output.curriculum = curriculum.Select(x => x).ToList();
             output.dayLims = dayLims.Select(x => x.Clone()).ToList();
             output.weekLims = weekLims.Select(x => x.Clone()).ToList();
             
@@ -133,6 +137,7 @@ namespace SchoolManager.School_Models
             output.subject2Teacher = subject2Teacher;
 
             output.dayLims = dayLims.Select(x => x.Clone()).ToList();
+            output.curriculum = curriculum.Select(x => x).ToList();
             output.weekLims = weekLimsKeep;
 
             output.subjectDayDependees = subjectDayDependees;
@@ -146,8 +151,6 @@ namespace SchoolManager.School_Models
 
         public override bool Equals(object obj)
         {
-            Console.WriteLine("a de");
-
             if (obj.GetType()==typeof(Group))
             {
                 return name.Equals((obj as Group).name);
@@ -183,6 +186,9 @@ namespace SchoolManager.School_Models
 
         public void applySubject(int s, int sign)
         {
+            if (sign == +1) curriculum.Add(subject2Teacher[s].Item1);
+            else curriculum.Remove(subject2Teacher[s].Item1);
+
             foreach (int ind in subjectDayDependees[s])
             {
                 dayLims[ind].cnt -= sign;
