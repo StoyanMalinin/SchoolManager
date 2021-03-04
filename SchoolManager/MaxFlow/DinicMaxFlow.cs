@@ -6,22 +6,7 @@ using System.Xml;
 
 namespace SchoolManager.MaxFlow
 {
-    class Edge
-    {
-        public int u;
-        public int v;
-        public int cap;
-
-        public Edge() { }
-        public Edge(int u, int v, int cap)
-        {
-            this.u = u;
-            this.v = v;
-            this.cap = cap;
-        }
-    }
-
-    class MaxFlowGraph
+    class DinicMaxFlowGraph : FlowGraph
     {
         int source, sink;
 
@@ -31,14 +16,14 @@ namespace SchoolManager.MaxFlow
         List<int> startInd;
         public List<int> dist { get; set; }
 
-        public MaxFlowGraph()
+        public DinicMaxFlowGraph()
         {
             this.dist = new List<int>();
             this.edges = new List<Edge>();
             this.startInd = new List<int>();
             this.adj = new List<List<int>>();
         }
-        public MaxFlowGraph(int n, int s, int t) : this()
+        public DinicMaxFlowGraph(int n, int s, int t) : this()
         {
             this.sink = t;
             this.source = s;
@@ -57,7 +42,7 @@ namespace SchoolManager.MaxFlow
             sink = t;
         }
 
-        public int addEdge(int u, int v, int cap)
+        public override int addEdge(int u, int v, int cap)
         {
             edges.Add(new Edge(u, v, cap));
             adj[u].Add(edges.Count - 1);
@@ -68,7 +53,7 @@ namespace SchoolManager.MaxFlow
             return edges.Count - 2;
         }
 
-        public int getEdge(int ind)
+        public override int getEdge(int ind)
         {
             return edges[ind^1].cap;
         }
@@ -125,7 +110,7 @@ namespace SchoolManager.MaxFlow
             return -1;
         }
 
-        public long Dinic()
+        public override long findFlow()
         {
             long maxFlow = 0;
             while (true)
@@ -137,7 +122,7 @@ namespace SchoolManager.MaxFlow
 
                 while (true)
                 {
-                    int add = dfs(source, int.MaxValue);
+                    int add = dfs(source, 1);
                     if (add == -1) break;
 
                     maxFlow += add;
@@ -145,6 +130,11 @@ namespace SchoolManager.MaxFlow
             }
 
             return maxFlow;
+        }
+
+        public override int addEdge(int u, int v, int cap, long cost)
+        {
+            throw new NotImplementedException();
         }
     }
 }

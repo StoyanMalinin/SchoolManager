@@ -104,7 +104,7 @@ namespace SchoolManager.Generation_utils
             allTeachersNode = node;
             node++;
 
-            G = new CirculationFlowGraph(node);
+            G = new CirculationFlowGraph(node*maxLessons);
         }
 
         void initArrays()
@@ -169,17 +169,16 @@ namespace SchoolManager.Generation_utils
         private void generateDay(int day)
         {
             G.reset();
-            //G = new CirculationFlowGraph(150);
 
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine($" ----- {day} ----- ");
 
-            //setting node demands
+            // ----- setting node demands -----
             G.setDemand(allTeachersNode, -(groups.Count * maxLessons));//redo later, when we can have daily lessons, different than maxLessons
             for (int g = 0; g < groups.Count; g++) G.setDemand(groupNode[g], maxLessons);
         
-            //adding edges
+            // ----- adding edges ----- 
             
             //connecting teachers to allTeachersNode
             for(int t = 0;t<teachers.Count;t++)
@@ -256,8 +255,8 @@ namespace SchoolManager.Generation_utils
                         int subjectLim = Math.Min(dayState[day][g].getSubjectDayLim(s),
                                                   dayState[day][g].getSubjectWeekLim(s));
                         groupSubjectEdge[g, s] = G.addEdge(x.nodeCode, x.parent.nodeCode, 
-                                                           Math.Max(0, lessonsLeft),
-                                                           subjectLim);
+                                                           Math.Max(0, lessonsLeft), subjectLim, 
+                                                           true);
                         
                         return;
                     }
@@ -305,7 +304,11 @@ namespace SchoolManager.Generation_utils
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day], teachers, maxLessons);
             
             DaySchedule ds = sc.gen(true);
-            if (ds is null) ds = sc.gen(false);
+            if (ds is null)
+            {
+                Console.WriteLine("FAILED");
+                ds = sc.gen(false);
+            }
 
             ds.print();
         }

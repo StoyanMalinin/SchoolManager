@@ -1,34 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace SchoolManager.MaxFlow
 {
-    //this assumes that we have only one source and sink
     class CirculationFlowGraph
     {
         class CirculationEdge
         {
             public int u, v;
             public int l, c;
+            public bool progressiveCost;
 
-            public CirculationEdge() { }
-            public CirculationEdge(int u, int v, int l, int c)
+            public CirculationEdge() 
+            {
+                this.progressiveCost = false;
+            }
+            public CirculationEdge(int u, int v, int l, int c) : this()
             {
                 this.u = u;
                 this.v = v;
                 this.l = l;
                 this.c = c;
             }
+            public CirculationEdge(int u, int v, int l, int c, bool progressiveCost) : this(u, v, l, c)
+            {
+                this.progressiveCost = progressiveCost;
+            }
         }
 
         private List<int> edgeInd = new List<int>();
-        private MaxFlowGraph G;
+        private FlowGraph G;
 
         private List<CirculationEdge> edges;
         private int[] demand;
         private int s, t;
+
+        private int auxNode;
 
         public CirculationFlowGraph() 
         {
@@ -42,6 +52,8 @@ namespace SchoolManager.MaxFlow
 
             s = demand.Length - 2;
             t = demand.Length - 1;
+
+            this.auxNode = demand.Length - 3;
         }
        
         public void reset()
@@ -62,6 +74,14 @@ namespace SchoolManager.MaxFlow
             return edges.Count - 1;
         }
 
+        public int addEdge(int u, int v, int l, int c, bool progressiveCost)
+        {
+            if (l == c) progressiveCost = false;
+
+            edges.Add(new CirculationEdge(u, v, l, c, progressiveCost));
+            return edges.Count - 1;
+        }
+
         public int getEdge(int ind)
         {
             return G.getEdge(edgeInd[ind]) + edges[ind].l;
@@ -69,6 +89,8 @@ namespace SchoolManager.MaxFlow
 
         public int eval()
         {
+            bool hasProgessiveCost = edges.Any(e => e.progressiveCost==true);
+
             //getting rid of the lower bounds
             foreach(CirculationEdge e in edges)
             {
@@ -77,7 +99,8 @@ namespace SchoolManager.MaxFlow
             }
 
             //building the MaxFlowGraph
-            G = new MaxFlowGraph(demand.Length, s, t);
+            if (hasProgessiveCost == true) G = new MinCostMaxFlowGraph(demand.Length, s, t);
+            else G = new DinicMaxFlowGraph(demand.Length, s, t);
 
             //connecting demand/supply nodes
             for(int x = 0;x<demand.Length;x++)
@@ -91,9 +114,20 @@ namespace SchoolManager.MaxFlow
 
             //doing the actual edges
             foreach (CirculationEdge e in edges)
-                edgeInd.Add(G.addEdge(e.u, e.v, e.c-e.l));
+            {
+                if (e.progressiveCost == false)
+                    edgeInd.Add(G.addEdge(e.u, e.v, e.c - e.l));
+                else
+                {
+                    edgeInd.Add(G.addEdge(auxNode, e.v, e.c - e.l));
+                    for(int f = 1;f<=e.c-e.l;f++)
+                        G.addEdge(e.u, auxNode, 1, (((long)1)<<f));
 
-            int maxFlow = (int)G.Dinic();
+                    auxNode--;
+                }
+            }
+
+            int maxFlow = (int)G.findFlow();
             Console.WriteLine($"maxFlow = {maxFlow}");
 
             return 69;
