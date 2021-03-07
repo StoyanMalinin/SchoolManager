@@ -22,5 +22,16 @@ namespace SchoolManager.School_Models
             Teacher output = new Teacher(name, subjects);
             return output;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (obj.GetType() == typeof(Teacher))
+            {
+                return name.Equals((obj as Teacher).name);
+            }
+
+            return false;
+        }
     }
 }

@@ -210,7 +210,7 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
-                Console.WriteLine($"{g} -> {string.Join(" ", teacherList[g].Select(x => x.Item1))}");
+                //Console.WriteLine($"{g} -> {string.Join(" ", teacherList[g].Select(x => x.Item1))}");
             }
 
             rec(0, onlyConsequtive);

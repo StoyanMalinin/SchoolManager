@@ -61,6 +61,8 @@ namespace SchoolManager.MaxFlow
             this.edges = new List<CirculationEdge>();
             this.edgeInd = new List<int>();
             for (int x = 0; x < demand.Length; x++) demand[x] = 0;
+
+            auxNode = demand.Length - 3;
         }
 
         public void setDemand(int x, int newDemand)
@@ -76,7 +78,7 @@ namespace SchoolManager.MaxFlow
 
         public int addEdge(int u, int v, int l, int c, bool progressiveCost)
         {
-            if (l == c) progressiveCost = false;
+            if(l==c) progressiveCost = false;
 
             edges.Add(new CirculationEdge(u, v, l, c, progressiveCost));
             return edges.Count - 1;
@@ -128,9 +130,7 @@ namespace SchoolManager.MaxFlow
             }
 
             int maxFlow = (int)G.findFlow();
-            Console.WriteLine($"maxFlow = {maxFlow}");
-
-            return 69;
+            return maxFlow;
         }
     }
 }

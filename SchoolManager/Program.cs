@@ -8,8 +8,6 @@ namespace SchoolManager
 {
     class Program
     {
-       
-
         static void Main(string[] args)
         {
             PerformanceTest1.init();
@@ -22,20 +20,26 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11а());
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
-            //groups.Add(PerformanceTest1._11d());
+            groups.Add(PerformanceTest1._11d());
             //groups.Add(PerformanceTest1._10a());
-            
-            //Shuffle(groups);
-            
-            //ScheduleGenerator sg = new ScheduleGenerator(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за учители
-            //ScheduleGenerator2 sg = new ScheduleGenerator2(groups, PerformanceTest1.teachers, PerformanceTest1.subjects);//за общи проблеми
-            ScheduleGenerator3 sg = new ScheduleGenerator3(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy);//за общи проблеми
+
+
+            List<Multilesson>[] multilessons = new List<Multilesson>[5 + 1];
+            for (int day = 1; day <= 5; day++)
+                multilessons[day] = new List<Multilesson>();
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
+            //multilessons[5].Add(new Multilesson(groups[7], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 1)));
+            multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[2], PerformanceTest1.subjects[3], new IntInInterval(1, 1)));
+            multilessons[1].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(0, 0)));
+
+            ScheduleGenerator3 sg = new ScheduleGenerator3(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy, multilessons);//за общи проблеми
             
             Stopwatch sw = new Stopwatch();
             sw.Start();
             sg.generate();
-            //sg.printSchedule(schedule);
             sw.Stop();
+            
             Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");
             while (true) ;
         }
