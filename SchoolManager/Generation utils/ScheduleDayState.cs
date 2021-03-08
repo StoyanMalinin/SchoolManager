@@ -22,9 +22,9 @@ namespace SchoolManager.Generation_utils
             for (int i = 0; i < teachers.Count; i++) this.teacherLeftLessons[i] = maxLessons;
         }
 
-        public bool check(int g, int s, int t)
+        public bool check(int g, int s, int t, int change)
         {
-            if (groupLeftLessons[g] == 0 || teacherLeftLessons[t] == 0 || groups[g].getSubjectDayLim(s) == 0) return false;
+            if (groupLeftLessons[g] + change < 0 || teacherLeftLessons[t] + change < 0 || groups[g].checkSubject(s, change)==false) return false;
             return true;
         }
 

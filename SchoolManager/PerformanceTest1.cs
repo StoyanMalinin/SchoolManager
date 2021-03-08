@@ -34,14 +34,14 @@ namespace SchoolManager
 
             subjects = new List<Subject>()
             {
-                new Subject("matematika", new List<LimitationGroup>(){ limitationGroups[0], limitationGroups[2] }),
-                new Subject("istoriq", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[3] }),
-                new Subject("geografiq", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[4] }),
-                new Subject("balgarski", new List<LimitationGroup>(){ limitationGroups[5]}),
-                new Subject("angliiski", new List<LimitationGroup>(){ limitationGroups[6]}),
-                new Subject("svqt i lichnost", new List<LimitationGroup>(){ limitationGroups[7]}),
-                new Subject("fizika", new List<LimitationGroup>(){ limitationGroups[8]}),
-                new Subject("fizichesko", new List<LimitationGroup>(){ limitationGroups[9]}),
+                new Subject("matematika", new List<LimitationGroup>(){ limitationGroups[0], limitationGroups[2] }),//0
+                new Subject("istoriq", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[3] }),//1
+                new Subject("geografiq", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[4] }),//2
+                new Subject("balgarski", new List<LimitationGroup>(){ limitationGroups[5]}),//3
+                new Subject("angliiski", new List<LimitationGroup>(){ limitationGroups[6]}),//4
+                new Subject("svqt i lichnost", new List<LimitationGroup>(){ limitationGroups[7]}),//5
+                new Subject("fizika", new List<LimitationGroup>(){ limitationGroups[8]}),//6
+                new Subject("fizichesko", new List<LimitationGroup>(){ limitationGroups[9]}),//7
             };
 
             teachers = new List<Teacher>()
@@ -128,6 +128,9 @@ namespace SchoolManager
             };
 
             Group g = new Group("12a", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(1, 1)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -176,6 +179,8 @@ namespace SchoolManager
             };
 
             Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -224,6 +229,8 @@ namespace SchoolManager
             };
 
             Group g = new Group("12v", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -272,6 +279,10 @@ namespace SchoolManager
             };
 
             Group g = new Group("12g", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[5], subjects[0], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -320,6 +331,8 @@ namespace SchoolManager
             };
 
             Group g = new Group("11a", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -368,6 +381,8 @@ namespace SchoolManager
             };
 
             Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -512,6 +527,8 @@ namespace SchoolManager
             };
 
             Group g = new Group("11d", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
     }

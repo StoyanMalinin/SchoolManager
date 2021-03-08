@@ -156,13 +156,13 @@ namespace SchoolManager.Generation_utils
             }
         }
 
-        private bool generateDay(int day)
+        private DaySchedule generateDay(int day)
         {
             G.reset();
 
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine($" ----- {day} ----- ");
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine($" ----- {day} ----- ");
 
             // ----- setting node demands -----
             G.setDemand(allTeachersNode, -(groups.Count * maxLessons));//redo later, when we can have daily lessons, different than maxLessons
@@ -313,22 +313,21 @@ namespace SchoolManager.Generation_utils
 
                         if (dayState[day].updateLimits(g, s, groupSubject2Teacher[g, s], +1) == false)
                         {
-                            return false;
+                            return null;
                         }
                     }
                 }
 
                 if (teacherInds.Count != maxLessons)
-                    return false;   
+                    return null;   
             }
 
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, maxLessons);
 
             DaySchedule ds = sc.gen(true);
-            if (ds is null) return false;
+            if (ds is null) return null;
 
-            ds.print();
-            return true;
+            return ds;
         }
 
         public bool runDiagnostics()
@@ -372,23 +371,32 @@ namespace SchoolManager.Generation_utils
             return true;
         }
 
-        public bool generate()
+        public WeekSchedule gen()
         {
+            WeekSchedule ws = new WeekSchedule(workDays);
+
             initNodes();
             initArrays();
             for(int day = 1;day<=workDays;day++)
             {
-                bool dayRes = generateDay(day);
-                if (dayRes == false) return false;
+                DaySchedule dayRes = generateDay(day);
+
+                if (dayRes == null) return null;
+                ws.days[day] = dayRes;
             }
 
             bool diagnosticsRes = runDiagnostics();
-            if (diagnosticsRes == true) Console.WriteLine("Kein problem!");
-            else Console.WriteLine("Es gibt ein problem!");
-
-            if (diagnosticsRes == false) return false;
-
-            return true;
+            
+            /*
+            if(mode==true)
+            {
+                if (diagnosticsRes == true) Console.WriteLine("Kein problem!");
+                else Console.WriteLine("Es gibt ein problem!");
+            }
+            */
+            
+            if (diagnosticsRes == false) return null;
+            return ws;
         }
     }
 }

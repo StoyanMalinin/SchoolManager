@@ -28,15 +28,15 @@ namespace SchoolManager
                 multilessons[day] = new List<Multilesson>();
             //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
             //multilessons[5].Add(new Multilesson(groups[7], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
-            multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 2)));
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 2)));
             //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[2], PerformanceTest1.subjects[3], new IntInInterval(1, 1)));
-            multilessons[3].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(2, 3)));
+            //multilessons[3].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(2, 3)));
 
-            ScheduleGenerator3 sg = new ScheduleGenerator3(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy, multilessons);//за общи проблеми
+            ScheduleGenerator4 sg = new ScheduleGenerator4(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy, multilessons);//за общи проблеми
             
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            sg.generate();
+            sg.gen();
             sw.Stop();
             
             Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");

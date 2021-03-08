@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SchoolManager.Generation_utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -35,8 +36,9 @@ namespace SchoolManager.School_Models
 
         private List<LimitationGroupPair> dayLims;
         public List<LimitationGroupPair> weekLims { get; private set; }
-
         public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
+
+        public List<Multilesson> requiredMultilessons;
 
         private List<int>[] subjectDayDependees, subjectWeekDependees;
         private int[] subjectDaySelf, subjectWeekSelf;
@@ -86,6 +88,15 @@ namespace SchoolManager.School_Models
                     }
                 }
             }
+
+            this.requiredMultilessons = new List<Multilesson>();
+        }
+        public Group(string name, List<Tuple<LimitationGroup, int>> dayLims,
+                                  List<Tuple<LimitationGroup, int>> weekLims,
+                                  List<Tuple<Subject, Teacher>> subject2Teacher, 
+                                  List <Multilesson> requiredMultilessons) : this(name, dayLims, weekLims, subject2Teacher)
+        {
+            this.requiredMultilessons = requiredMultilessons;
         }
 
         public int getSubjectDayLim(int s)
@@ -134,6 +145,8 @@ namespace SchoolManager.School_Models
             output.subjectDaySelf = subjectDaySelf;
             output.subjectWeekSelf = subjectWeekSelf;
 
+            output.requiredMultilessons = requiredMultilessons;
+
             return output;
         }
 
@@ -153,6 +166,8 @@ namespace SchoolManager.School_Models
 
             output.subjectDaySelf = subjectDaySelf;
             output.subjectWeekSelf = subjectWeekSelf;
+
+            output.requiredMultilessons = requiredMultilessons;
 
             return output;
         }
