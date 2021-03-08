@@ -98,6 +98,14 @@ namespace SchoolManager.School_Models
             return weekLims[subjectWeekSelf[s]].cnt;
         }
 
+        public int getLimGroupDayLim(LimitationGroup lg)
+        {
+            var x = dayLims.FirstOrDefault(item => item.g.Equals(lg)==true);
+            
+            if (x == null) return int.MaxValue;
+            return x.cnt;
+        }
+
         public int findSubject(Subject s)
         {
             for(int i = 0;i<subject2Teacher.Count;i++)

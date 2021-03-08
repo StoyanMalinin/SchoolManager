@@ -4,13 +4,7 @@ using SchoolManager.School_Models;
 using SchoolManager.School_Models.Higharchy;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace SchoolManager.Generation_utils
 {
@@ -51,7 +45,6 @@ namespace SchoolManager.Generation_utils
             this.multilessons = multilessons;
         }
 
-        //private List<Group>[] dayState;
         private ScheduleDayState[] dayState;
 
         private int[] teacherNode;
@@ -63,7 +56,6 @@ namespace SchoolManager.Generation_utils
 
         private CirculationFlowGraph G;
 
-        //private int[,] teacherLeftLessons, groupLeftLessons;
         private List<int>[,] teacherGroup2Subjects;
         private int[,] groupSubject2Teacher;
 
@@ -281,7 +273,15 @@ namespace SchoolManager.Generation_utils
                     }
 
                     if (x.parent != null)
-                        G.addEdge(x.nodeCode, x.parent.nodeCode, 0, maxLessons);
+                    {
+                        int lim = maxLessons;
+                        
+                        if(x.GetType() == typeof(LimitationTreeNode))
+                            lim = Math.Min(lim, dayState[day].groups[g].getLimGroupDayLim((x as LimitationTreeNode).lg));
+                        
+                        G.addEdge(x.nodeCode, x.parent.nodeCode, 0, lim);
+                    }
+                        
 
                     foreach (TreeNode y in x.children)
                         dfs(y);

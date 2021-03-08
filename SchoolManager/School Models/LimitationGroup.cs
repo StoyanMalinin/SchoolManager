@@ -13,6 +13,12 @@ namespace SchoolManager.School_Models
         {
             this.name = name;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() != typeof(LimitationGroup)) return false;
+            return name.Equals((obj as LimitationGroup).name);
+        }
     }
 
 }
