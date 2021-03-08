@@ -21,17 +21,16 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
-            //groups.Add(PerformanceTest1._10a());
-
+            groups.Add(PerformanceTest1._10a());
 
             List<Multilesson>[] multilessons = new List<Multilesson>[5 + 1];
             for (int day = 1; day <= 5; day++)
                 multilessons[day] = new List<Multilesson>();
             //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
             //multilessons[5].Add(new Multilesson(groups[7], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
-            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 1)));
-            multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[2], PerformanceTest1.subjects[3], new IntInInterval(1, 1)));
-            multilessons[1].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(0, 0)));
+            multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 2)));
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[2], PerformanceTest1.subjects[3], new IntInInterval(1, 1)));
+            multilessons[3].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(2, 3)));
 
             ScheduleGenerator3 sg = new ScheduleGenerator3(groups, PerformanceTest1.teachers, PerformanceTest1.subjects, PerformanceTest1.higharchy, multilessons);//за общи проблеми
             
