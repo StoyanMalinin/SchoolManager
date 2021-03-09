@@ -20,16 +20,17 @@ namespace SchoolManager
         {
             limitationGroups = new List<LimitationGroup>()
             {
-                new LimitationGroup("to4ni"),
-                new LimitationGroup("razkazvatelni"),
-                new LimitationGroup("matematika"),
-                new LimitationGroup("istoriq"),
-                new LimitationGroup("geografiq"),
-                new LimitationGroup("balgarski"),
-                new LimitationGroup("angliiski"),
-                new LimitationGroup("svqt i lichnost"),
-                new LimitationGroup("fizika"),
-                new LimitationGroup("fizichesko"),
+                new LimitationGroup("to4ni"),//0
+                new LimitationGroup("razkazvatelni"),//1
+                new LimitationGroup("matematika"),//2
+                new LimitationGroup("istoriq"),//3
+                new LimitationGroup("geografiq"),//4
+                new LimitationGroup("balgarski"),//5
+                new LimitationGroup("angliiski"),//6
+                new LimitationGroup("svqt i lichnost"),//7
+                new LimitationGroup("fizika"),//8
+                new LimitationGroup("fizichesko"),//9
+                new LimitationGroup("rosski/nemski"),//10
             };
 
             subjects = new List<Subject>()
@@ -42,6 +43,7 @@ namespace SchoolManager
                 new Subject("svqt i lichnost", new List<LimitationGroup>(){ limitationGroups[7]}),//5
                 new Subject("fizika", new List<LimitationGroup>(){ limitationGroups[8]}),//6
                 new Subject("fizichesko", new List<LimitationGroup>(){ limitationGroups[9]}),//7
+                new Subject("rosski/nemski", new List<LimitationGroup>(){ limitationGroups[10]}),//8
             };
 
             teachers = new List<Teacher>()
@@ -60,6 +62,8 @@ namespace SchoolManager
                 new Teacher("vlashka", new List<Subject>(){  }),//11
                 new Teacher("tisheto", new List<Subject>(){  }),//12
                 new Teacher("kongalov", new List<Subject>(){  }),//13
+                new Teacher("daskalova", new List<Subject>(){  }),//14
+                new Teacher("ruskinqta", new List<Subject>(){  }),//15
             };
 
             higharchy.addChild(new LimitationTreeNode(limitationGroups[0]));
@@ -69,6 +73,7 @@ namespace SchoolManager
             higharchy.addChild(new SubjectTreeNode(subjects[5]));
             higharchy.addChild(new SubjectTreeNode(subjects[6]));
             higharchy.addChild(new SubjectTreeNode(subjects[7]));
+            higharchy.addChild(new SubjectTreeNode(subjects[8]));
             
             (higharchy.children[0] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[0]));
             (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[1]));
@@ -98,6 +103,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -105,14 +111,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -125,11 +132,13 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], teachers[15]),
             };
 
             Group g = new Group("12a", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(1, 1)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
 
             return g;
         }
@@ -149,6 +158,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -156,14 +166,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -176,6 +187,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
@@ -199,6 +211,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -206,14 +219,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -226,6 +240,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("12v", dayLims, weekLims, subject2Teacher);
@@ -351,6 +366,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -358,14 +374,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -378,10 +395,12 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
 
             return g;
         }
@@ -401,6 +420,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -408,14 +428,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -428,9 +449,12 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("11v", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -479,6 +503,9 @@ namespace SchoolManager
             };
 
             Group g = new Group("10a", dayLims, weekLims, subject2Teacher);
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+
             return g;
         }
 
@@ -528,8 +555,49 @@ namespace SchoolManager
 
             Group g = new Group("11d", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
+            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
 
             return g;
+        }
+    
+        public static SuperGroup _vtoriEzik12BV()
+        {
+            List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
+            {
+                Tuple.Create(_12b(), subjects[8]),
+                Tuple.Create(_12v(), subjects[8]),
+            };
+
+            List<Teacher> currTeachers = new List<Teacher>()
+            {
+                teachers[14],
+                teachers[15],
+            };
+
+            List<int> requiredMultilessons = new List<int>() { 2 };
+            SuperGroup sg = new SuperGroup("vtori12BV", currGroups, currTeachers, 2, requiredMultilessons);
+
+            return sg;
+        }
+
+        public static SuperGroup _vtoriEzik11BV()
+        {
+            List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
+            {
+                Tuple.Create(_11b(), subjects[8]),
+                Tuple.Create(_11v(), subjects[8]),
+            };
+
+            List<Teacher> currTeachers = new List<Teacher>()
+            {
+                teachers[14],
+                teachers[15],
+            };
+
+            List<int> requiredMultilessons = new List<int>() { 2 };
+            SuperGroup sg = new SuperGroup("vtori11BV", currGroups, currTeachers, 2, requiredMultilessons);
+
+            return sg;
         }
     }
 }

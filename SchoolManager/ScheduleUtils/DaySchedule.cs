@@ -10,17 +10,22 @@ namespace SchoolManager.ScheduleUtils
     {
         private int maxLessons;
         private List<Teacher> teachers;
-        public Group[,] lessonTeacher2Group;
         public Subject[,] lessonTeacher2Subject;
         public Subject[,] lessonGroup2Subject;
 
-        public DaySchedule(List <List<Subject>> orderedCurriculums, List <Teacher> teachers, List <Group> groups, int maxLessons)
+        public Group[,] lessonTeacher2Group;
+        public SuperGroup[,] lessonTeacher2SuperGroup; 
+
+        public DaySchedule(List <List<Subject>> orderedCurriculums, List <Teacher> teachers, List <Group> groups, 
+                           List <List<SuperGroup>> orderedSuperGroupCurriculums, int maxLessons)
         {
             this.teachers = teachers;
             this.maxLessons = maxLessons;
             this.lessonGroup2Subject = new Subject[maxLessons+1, groups.Count];
-            this.lessonTeacher2Group = new Group[maxLessons + 1, teachers.Count];
             this.lessonTeacher2Subject = new Subject[maxLessons + 1, teachers.Count];
+            
+            this.lessonTeacher2Group = new Group[maxLessons + 1, teachers.Count];
+            this.lessonTeacher2SuperGroup = new SuperGroup[maxLessons + 1, teachers.Count];
 
             for(int g = 0;g<orderedCurriculums.Count;g++)
             {
@@ -32,22 +37,32 @@ namespace SchoolManager.ScheduleUtils
                     int tInd = teachers.FindIndex(x => x.Equals(t));
 
                     lessonGroup2Subject[l+1, g] = orderedCurriculums[g][l];
-                    lessonTeacher2Group[l+1, tInd] = groups[g];
-                    lessonTeacher2Subject[l+1, tInd] = s;
+                    if (tInd != -1)
+                    {
+                        lessonTeacher2Group[l + 1, tInd] = groups[g];
+                        lessonTeacher2Subject[l + 1, tInd] = s;
+                    }
+                    else
+                    {
+                        foreach (Teacher item in orderedSuperGroupCurriculums[g][l].teachers)
+                            lessonTeacher2SuperGroup[l+1, teachers.FindIndex(x => x.Equals(item))] = orderedSuperGroupCurriculums[g][l];
+                    }
+                    
                 }
             }
         }
         public void print()
         { 
-            Console.Write("     ");
-            Console.WriteLine(string.Join(" ", teachers.Select(t => String.Format("{0, -14}", $"|{t.name}")).ToList()));
+            Console.Write("   ");
+            Console.WriteLine(string.Join(" ", teachers.Select(t => String.Format("{0, -12}", $"|{t.name}")).ToList()));
             for(int l = 1;l<=maxLessons;l++)
             {
-                Console.Write(String.Format("{0, -5}", $"{l}: "));
+                Console.Write(String.Format("{0, -3}", $"{l}: "));
                 for (int t = 0; t < teachers.Count; t++)
                 {
-                    if(lessonTeacher2Group[l, t]!=null) Console.Write(String.Format("{0, -15}", $"|{lessonTeacher2Group[l, t].name}"));
-                    else Console.Write(String.Format("{0, -15}", "|"));
+                    if(lessonTeacher2Group[l, t]!=null) Console.Write(String.Format("{0, -13}", $"|{lessonTeacher2Group[l, t].name}"));
+                    else if(lessonTeacher2SuperGroup[l, t]!= null) Console.Write(String.Format("{0, -13}", $"|{lessonTeacher2SuperGroup[l, t].name}"));
+                    else Console.Write(String.Format("{0, -13}", "|"));
                 }
 
                 Console.WriteLine();

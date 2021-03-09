@@ -70,17 +70,20 @@ namespace SchoolManager.School_Models
                 foreach (LimitationGroup lg in subject2Teacher[i].Item1.limGroups)
                 {
                     for (int j = 0; j < dayLims.Count; j++)
-                    {
-                        if (dayLims[j].Item1 == lg)
+                    {                        
+                        if (dayLims[j].Item1.Equals(lg) == true)
                         {
                             subjectDayDependees[i].Add(j);
-                            if (dayLims[j].Item1.name == subject2Teacher[i].Item1.name) subjectDaySelf[i] = j;
+                            if (dayLims[j].Item1.name == subject2Teacher[i].Item1.name)
+                            {
+                                subjectDaySelf[i] = j;
+                            }
                         }
                     }
 
                     for (int j = 0; j < weekLims.Count; j++)
                     {
-                        if (weekLims[j].Item1 == lg)
+                        if (weekLims[j].Item1.Equals(lg)==true)
                         {
                             subjectWeekDependees[i].Add(j);
                             if (weekLims[j].Item1.name == subject2Teacher[i].Item1.name) subjectWeekSelf[i] = j;

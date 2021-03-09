@@ -18,11 +18,12 @@ namespace SchoolManager.Generation_utils
         private List<Subject> subjects;
         private TreeNode higharchy;
 
+        private List<Tuple<SuperGroup, int>>[] supergroupMultilessons;
         private List<Multilesson>[] multilessons;  
 
         public ScheduleGenerator3() { }
-        public ScheduleGenerator3(List <Group> groups, List <Teacher> teachers, 
-                                  List <Subject> subjects, TreeNode higharchy)
+        public ScheduleGenerator3(List<Group> groups, List<Teacher> teachers,
+                                  List<Subject> subjects, TreeNode higharchy)
         {
             this.groups = groups;
             this.teachers = teachers;
@@ -35,14 +36,25 @@ namespace SchoolManager.Generation_utils
             teacherNode = new int[teachers.Count];
             groupSubjectNode = new int[groups.Count, subjects.Count];
 
-            this.multilessons = new List<Multilesson>[workDays+1];
+            this.multilessons = new List<Multilesson>[workDays + 1];
+            this.supergroupMultilessons = new List<Tuple<SuperGroup, int>>[workDays + 1];
             for (int day = 1; day <= workDays; day++)
+            {
                 this.multilessons[day] = new List<Multilesson>();
+                this.supergroupMultilessons[day] = new List<Tuple<SuperGroup, int>>();
+            }
         }
         public ScheduleGenerator3(List<Group> groups, List<Teacher> teachers,
                                   List<Subject> subjects, TreeNode higharchy, List<Multilesson>[] multilessons) : this(groups, teachers, subjects, higharchy)
         {
             this.multilessons = multilessons;
+        }
+        public ScheduleGenerator3(List<Group> groups, List<Teacher> teachers,
+                                  List<Subject> subjects, TreeNode higharchy, 
+                                  List<Multilesson>[] multilessons, 
+                                  List<Tuple<SuperGroup, int>>[] supergroupMultilessons) : this(groups, teachers, subjects, higharchy, multilessons)
+        {
+            this.supergroupMultilessons = supergroupMultilessons;
         }
 
         private ScheduleDayState[] dayState;
@@ -81,10 +93,6 @@ namespace SchoolManager.Generation_utils
             {
                 groupHigharchy[g] = higharchy.Clone();
                 groupHigharchy[g].encodeTree(ref node);
-
-                //Console.WriteLine();
-                //Console.WriteLine($"Group: {groups[g].name}");
-                //groupHigharchy[g].printTree();
             }
             for(int g = 0;g<groups.Count;g++)
             {
@@ -92,7 +100,8 @@ namespace SchoolManager.Generation_utils
                 {
                     if(x.GetType()==typeof(SubjectTreeNode))
                     {
-                        groupSubjectNode[g, groups[g].findSubject((x as SubjectTreeNode).s)] = x.nodeCode;
+                        int sInd = groups[g].findSubject((x as SubjectTreeNode).s);
+                        if(sInd!=-1) groupSubjectNode[g, sInd] = x.nodeCode;
                         //Console.WriteLine($"{g} -> [{groups[g].findSubject((x as SubjectTreeNode).s)} <=> {x.nodeCode}]");
 
                         return;
@@ -108,7 +117,7 @@ namespace SchoolManager.Generation_utils
             allTeachersNode = node;
             node++;
 
-            G = new CirculationFlowGraph(node*maxLessons);
+            G = new CirculationFlowGraph(node*2);
         }
 
         void initArrays()
@@ -160,13 +169,9 @@ namespace SchoolManager.Generation_utils
         {
             G.reset();
 
-            //Console.WriteLine();
-            //Console.WriteLine();
-            //Console.WriteLine($" ----- {day} ----- ");
-
             // ----- setting node demands -----
-            G.setDemand(allTeachersNode, -(groups.Count * maxLessons));//redo later, when we can have daily lessons, different than maxLessons
-            for (int g = 0; g < groups.Count; g++) G.setDemand(groupNode[g], maxLessons);
+            G.setDemand(allTeachersNode, -(Enumerable.Range(0, groups.Count).Sum(ind => dayState[day].groupLeftLessons[ind])));//redo later, when we can have daily lessons, different than maxLessons
+            for (int g = 0; g < groups.Count; g++) G.setDemand(groupNode[g], dayState[day].groupLeftLessons[g]);
         
             // ----- adding edges ----- 
             
@@ -230,15 +235,18 @@ namespace SchoolManager.Generation_utils
                     if(x.GetType()==typeof(SubjectTreeNode))
                     {
                         int s = dayState[day].groups[g].findSubject((x as SubjectTreeNode).s);
-                        if (dayState[day].groups[g].subject2Teacher[s].Item2 == null) return;
                         
+                        if (s == -1) return;
+                        if (dayState[day].groups[g].subject2Teacher[s].Item2 == null) return;
+
                         int teacherInd = groupSubject2Teacher[g, s];
                         int lessonsLeft = dayState[day].groups[g].getSubjectWeekLim(s);
 
                         for (int d = day+1; d <= workDays; d++)
                         {
-                            List <Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g])==true && m.s.Equals((x as SubjectTreeNode).s) == true).ToList();
-
+                            List <Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g])==true 
+                                                                                 && m.s.Equals((x as SubjectTreeNode).s) == true).ToList();
+                            
                             int rm = 0;
                             if(important.Count==0)
                             {
@@ -282,7 +290,6 @@ namespace SchoolManager.Generation_utils
                         G.addEdge(x.nodeCode, x.parent.nodeCode, 0, lim);
                     }
                         
-
                     foreach (TreeNode y in x.children)
                         dfs(y);
                 }
@@ -294,7 +301,7 @@ namespace SchoolManager.Generation_utils
             //for now the capacities will be simply maxLessons
             for(int g = 0;g<groups.Count;g++)
             {
-                G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 0, maxLessons);
+                G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 0, dayState[day].groupLeftLessons[g]);
             }
 
             G.eval();
@@ -303,9 +310,13 @@ namespace SchoolManager.Generation_utils
             {
                 //Console.WriteLine($"---- {groups[g].name} ---");
 
+                int expectedCnt = dayState[day].groupLeftLessons[g];
                 List<int> teacherInds = new List<int>();
+
                 for (int s = 0; s < groups[g].subject2Teacher.Count; s++)
                 {
+                    if (groups[g].subject2Teacher[s].Item2 is null) continue;
+
                     for (int i = 0; i < G.getEdge(groupSubjectEdge[g, s]); i++)
                     {
                         teacherInds.Add(groupSubject2Teacher[g, s]);
@@ -318,11 +329,11 @@ namespace SchoolManager.Generation_utils
                     }
                 }
 
-                if (teacherInds.Count != maxLessons)
+                if (dayState[day].groups[g].curriculum.Count != maxLessons)
                     return null;   
             }
 
-            ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, maxLessons);
+            ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
 
             DaySchedule ds = sc.gen(true);
             if (ds is null) return null;
@@ -349,7 +360,7 @@ namespace SchoolManager.Generation_utils
                 for (int s = 0; s < dayState[1].groups[g].subject2Teacher.Count; s++)
                 {
                     for(int day = 1;day<=workDays;day++)
-                    {
+                    {                        
                         if (dayState[day].groups[g].getSubjectDayLim(s) < 0)
                             return false;
                     }   
@@ -377,15 +388,40 @@ namespace SchoolManager.Generation_utils
 
             initNodes();
             initArrays();
-            for(int day = 1;day<=workDays;day++)
+
+            for (int day = 1; day <= workDays; day++)
             {
+                //Console.WriteLine($"supergroupMultilessons[{day}].Count = {supergroupMultilessons[day].Count}");
+                foreach (var item in supergroupMultilessons[day])
+                {
+                    foreach (Tuple<Group, Subject> tup in item.Item1.groups)
+                    {
+                        //Console.WriteLine($"------------{day} {item.Item1.name} {item.Item2}");
+                        for (int iter = 0; iter < item.Item2; iter++)
+                        {
+                            int g = groups.FindIndex(g => g.Equals(tup.Item1));
+                            int s = groups[g].findSubject(tup.Item2);
+
+                            if (dayState[day].updateLimits(g, s, +1) == false)
+                                return null;
+                        }
+                    }
+                }
+            }
+
+            for (int day = 1;day<=workDays;day++)
+            {
+                //Console.WriteLine($"---{day}");
                 DaySchedule dayRes = generateDay(day);
 
                 if (dayRes == null) return null;
                 ws.days[day] = dayRes;
             }
 
+            Console.WriteLine("davai volene");
+
             bool diagnosticsRes = runDiagnostics();
+            //if (diagnosticsRes == false) Console.WriteLine("kurrrrr");
             
             /*
             if(mode==true)

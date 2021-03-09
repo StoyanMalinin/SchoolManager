@@ -59,21 +59,49 @@ namespace SchoolManager.Generation_utils
 
         private List<Group> state;
         private List<Teacher> teachers;
+        private List<Tuple<SuperGroup, int>> supergroupMultilessons;
 
         public ScheduleCompleter() { }
-        public ScheduleCompleter(List<Group> state, List<Teacher> teachers, int maxLessons)
+        public ScheduleCompleter(List<Group> state, List<Teacher> teachers, List <Tuple <SuperGroup, int>> supergroupMultilessons, int maxLessons)
         {
-            this.maxLessons = maxLessons;
-            this.teachers = teachers;
             this.state = state;
+            this.teachers = teachers;
+            this.maxLessons = maxLessons;
+            this.supergroupMultilessons = compressSGMultilesons(supergroupMultilessons.Select(x => Tuple.Create(x.Item1.Clone(), x.Item2)).ToList());
+        }
+
+        private List<Tuple<SuperGroup, int>> compressSGMultilesons(List <Tuple <SuperGroup, int>> l)
+        {
+            //Console.WriteLine($"%%{l.Count}");
+
+            //redo later when we can differenciate better between SuperGroups
+            l = l.OrderBy(x => x.Item1.name).ToList();
+
+            List<Tuple<SuperGroup, int>> output = new List<Tuple<SuperGroup, int>>();
+            for(int i = 0;i<l.Count;)
+            {
+                int startInd = i, sum = 0;
+                for (; i < l.Count && l[startInd].Equals(l[i]); i++) sum += l[i].Item2;
+
+                output.Add(Tuple.Create(l[startInd].Item1, sum));
+                //Console.WriteLine($"{l[startInd].Item1.name} || {sum}");
+            }
+
+            return output;
         }
 
         private DaySchedule output = null;
-        private bool[,] lessonTeacher;
+        private int[,] lessonTeacher;
         private List<Tuple<int, Subject>>[] solution;
 
         private List<Tuple <int, Subject>>[] teacherList;
         private HashSet<TeacherList>[] teacherPermList;
+
+        private int[] superTeacherInd;
+        private List<int>[] teacherDependees;
+
+        private bool[] isTeacherLocked;
+        private bool[,] teacherPosLocked;
 
         private HashSet<TeacherList> genPerms(List<Tuple <int, Subject>> l)
         {
@@ -130,62 +158,189 @@ namespace SchoolManager.Generation_utils
             return ans;
         }
 
+        private bool checkSuitable(TeacherList tl, bool onlyConsequtive)
+        {
+            if (onlyConsequtive == true && tl.isGood == false) return false;
+
+            bool fail = false;
+            for (int lesson = 0; lesson < tl.l.Count; lesson++)
+            {
+                if (isTeacherLocked[tl.l[lesson].Item1] == true && teacherPosLocked[lesson, tl.l[lesson].Item1] == false)
+                {
+                    return false;
+                }
+
+                if (tl.l[lesson].Item1 < teachers.Count)
+                {
+                    if (lessonTeacher[lesson, tl.l[lesson].Item1] > 0)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if(isTeacherLocked[tl.l[lesson].Item1]==false)
+                    {
+                        int sgInd = Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
+                        foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
+                        {
+                            int tInd = teachers.FindIndex(x => x.Equals(t) == true);
+                            if (lessonTeacher[lesson, tInd] > 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }                        
+                }
+            }
+
+            return true;
+        }
+
         private void rec(int g, bool onlyConsequtive)
         {
             if (output != null) return;
             if (g == state.Count)
             {
+                //Console.WriteLine("aideeee");
+
                 output = new DaySchedule(solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null)?null:y.Item2)).ToList()).ToList(), 
-                                         teachers, state, maxLessons);
+                                         teachers, state, 
+                                         solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null || y.Item1 < teachers.Count) ? null 
+                                         : supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count)
+                                                                            .First(ind => superTeacherInd[ind]==y.Item1)].Item1)).ToList()).ToList()
+                                         , maxLessons);
                 return;
             }
 
-            foreach (TeacherList tl in teacherPermList[g])
+            for(int gInd = g;gInd<state.Count;gInd++)
+            {
+                if (teacherPermList[gInd].Any(tl => checkSuitable(tl, onlyConsequtive)==true)==false) return;
+            }
+
+            IEnumerable<TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true);
+            foreach (TeacherList tl in teacherLists)
             {
                 if (onlyConsequtive == true && tl.isGood == false) continue;
 
                 bool fail = false;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
                 {
-                    if (lessonTeacher[lesson, tl.l[lesson].Item1] == true)
+                    if (isTeacherLocked[tl.l[lesson].Item1] == true && teacherPosLocked[lesson, tl.l[lesson].Item1] == false)
                     {
                         fail = true;
                         break;
+                    }
+
+                    if (tl.l[lesson].Item1 < teachers.Count)
+                    {
+                        if (lessonTeacher[lesson, tl.l[lesson].Item1] > 0)
+                        {
+                            fail = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (isTeacherLocked[tl.l[lesson].Item1] == false)
+                        {
+                            int sgInd = Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
+                            foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
+                            {
+                                int tInd = teachers.FindIndex(x => x.Equals(t) == true);
+                                if (lessonTeacher[lesson, tInd] > 0)
+                                {
+                                    fail = true;
+                                    break;
+                                }
+                            }
+
+                            if (fail == true) break;
+                        }
                     }
                 }
                 if (fail == true) continue;
 
                 solution[g] = tl.l;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
-                    lessonTeacher[lesson, tl.l[lesson].Item1] = true;
+                {
+                    if(tl.l[lesson].Item1>=teachers.Count)
+                    {
+                        if (lessonTeacher[lesson, tl.l[lesson].Item1] == 0)
+                        {
+                            teacherPosLocked[lesson, tl.l[lesson].Item1] = true;
+                            isTeacherLocked[tl.l[lesson].Item1] = true;
+                            
+                            foreach (int t in teacherDependees[tl.l[lesson].Item1])
+                                lessonTeacher[lesson, t]++;
+                        }
+                    }
+                    lessonTeacher[lesson, tl.l[lesson].Item1]++;
+                }
+                    
 
                 rec(g + 1, onlyConsequtive);
 
                 solution[g] = null;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
-                    lessonTeacher[lesson, tl.l[lesson].Item1] = false;
+                {
+                    if (tl.l[lesson].Item1 >= teachers.Count)
+                    {
+                        if (lessonTeacher[lesson, tl.l[lesson].Item1] == 1)
+                        {
+                            teacherPosLocked[lesson, tl.l[lesson].Item1] = false;
+                            isTeacherLocked[tl.l[lesson].Item1] = false;
+                            
+                            foreach (int t in teacherDependees[tl.l[lesson].Item1])
+                                lessonTeacher[lesson, t]--;
+                        }
+                    }
+                    lessonTeacher[lesson, tl.l[lesson].Item1]--;
+                }
             }
         }
 
-        public DaySchedule gen(bool onlyConsequtive = false)
+        private void init()
         {
-            //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
-            //Console.WriteLine(state.Count);
-
             solution = new List<Tuple<int, Subject>>[teachers.Count];
             teacherList = new List<Tuple<int, Subject>>[state.Count];
             teacherPermList = new HashSet<TeacherList>[state.Count];
-            lessonTeacher = new bool[maxLessons + 1, teachers.Count];
+            lessonTeacher = new int[maxLessons + 1, teachers.Count + supergroupMultilessons.Count + 1];
+            superTeacherInd = new int[supergroupMultilessons.Count];
+            teacherDependees = new List<int>[teachers.Count + supergroupMultilessons.Count + 1];
 
             for (int l = 1; l <= maxLessons; l++)
-                for (int t = 0; t < teachers.Count; t++)
-                    lessonTeacher[l, t] = false;
+                for (int t = 0; t < teachers.Count + supergroupMultilessons.Count + 1; t++)
+                    lessonTeacher[l, t] = 0;
+
+            teacherPosLocked = new bool[maxLessons+1, teachers.Count + supergroupMultilessons.Count + 1];
+            for (int l = 0; l < maxLessons + 1; l++)
+                for (int t = 0; t < teachers.Count + supergroupMultilessons.Count + 1; t++)
+                    teacherPosLocked[l, t] = false;
+
+            isTeacherLocked = new bool[teachers.Count + supergroupMultilessons.Count + 1];
+            for (int t = 0; t < isTeacherLocked.Length; t++)
+                isTeacherLocked[t] = false;
+
+            for (int g = 0; g < state.Count; g++)
+                teacherList[g] = new List<Tuple<int, Subject>>();
+
+            for (int i = 0; i < supergroupMultilessons.Count; i++)
+            {
+                superTeacherInd[i] = teachers.Count + i;
+                teacherDependees[superTeacherInd[i]] = supergroupMultilessons[i].Item1.teachers.Select(x => teachers.FindIndex(t => t.Equals(x))).ToList();
+
+                for(int iter = 0;iter<supergroupMultilessons[i].Item2;iter++)
+                    foreach (var item in supergroupMultilessons[i].Item1.groups)
+                        teacherList[state.FindIndex(g => g.Equals(item.Item1) == true)].Add(Tuple.Create(superTeacherInd[i], item.Item2));
+            }
 
             for (int g = 0; g < state.Count; g++)
             {
-                teacherList[g] = new List<Tuple<int, Subject>>();
                 for (int s = 0; s < state[g].subject2Teacher.Count; s++)
                 {
+                    if (state[g].subject2Teacher[s].Item2 is null) continue;
+
                     int cnt = state[g].curriculum.Count(x => x.Equals(state[g].subject2Teacher[s].Item1));
                     if (cnt == 0) continue;
 
@@ -212,8 +367,17 @@ namespace SchoolManager.Generation_utils
                 teacherPermList[g] = genPerms(teacherList[g]);
                 //Console.WriteLine($"{g} -> {string.Join(" ", teacherList[g].Select(x => x.Item1))}");
             }
+        }
 
+        public DaySchedule gen(bool onlyConsequtive = false)
+        {
+            //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
+            //Console.WriteLine(state.Count);
+            init();
+            
             rec(0, onlyConsequtive);
+            //if (output != null) Console.WriteLine("opa naredihme gi");
+
             return output;
         }
     }

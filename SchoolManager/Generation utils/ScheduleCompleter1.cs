@@ -158,7 +158,7 @@ namespace SchoolManager.Generation_utils
                     }   
                 }
 
-                output = new DaySchedule(solution, teachers, state, maxLessons);
+                //output = new DaySchedule(solution, teachers, state, maxLessons);
             }
 
             return output;

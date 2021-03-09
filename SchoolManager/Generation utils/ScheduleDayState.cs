@@ -37,5 +37,14 @@ namespace SchoolManager.Generation_utils
             if (groupLeftLessons[g] < 0 || teacherLeftLessons[t] < 0 || groups[g].getSubjectDayLim(s) < 0) return false;
             return true;
         }
+
+        public bool updateLimits(int g, int s, int sign)
+        {
+            groupLeftLessons[g] -= sign;
+            groups[g].applySubject(s, sign);
+
+            if (groupLeftLessons[g] < 0 || groups[g].getSubjectDayLim(s) < 0) return false;
+            return true;
+        }
     }
 }
