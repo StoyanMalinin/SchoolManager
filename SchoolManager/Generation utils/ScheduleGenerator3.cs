@@ -394,15 +394,23 @@ namespace SchoolManager.Generation_utils
                 //Console.WriteLine($"supergroupMultilessons[{day}].Count = {supergroupMultilessons[day].Count}");
                 foreach (var item in supergroupMultilessons[day])
                 {
-                    foreach (Tuple<Group, Subject> tup in item.Item1.groups)
+                    for(int iter = 0;iter<item.Item2;iter++)
                     {
-                        //Console.WriteLine($"------------{day} {item.Item1.name} {item.Item2}");
-                        for (int iter = 0; iter < item.Item2; iter++)
+                        foreach (Tuple<Group, Subject> tup in item.Item1.groups)
                         {
+                            //Console.WriteLine($"------------{day} {item.Item1.name} {item.Item2}");
+                            
                             int g = groups.FindIndex(g => g.Equals(tup.Item1));
                             int s = groups[g].findSubject(tup.Item2);
 
-                            if (dayState[day].updateLimits(g, s, +1) == false)
+                            if (dayState[day].updateLimitsNoTeacher(g, s, +1) == false)
+                                return null;   
+                        }
+
+                        foreach (Teacher t in item.Item1.teachers)
+                        {
+                            int tInd = teachers.FindIndex(x => x.Equals(t) == true);
+                            if (dayState[day].updateTeacherLimits(tInd, +1) == false)
                                 return null;
                         }
                     }

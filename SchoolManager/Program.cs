@@ -18,7 +18,7 @@ namespace SchoolManager
             groups.Add(PerformanceTest1._12b());
             groups.Add(PerformanceTest1._12v());
             groups.Add(PerformanceTest1._12g());
-            groups.Add(PerformanceTest1._11а());
+            groups.Add(PerformanceTest1._11a());
             groups.Add(PerformanceTest1._11b());
             groups.Add(PerformanceTest1._11v());
             groups.Add(PerformanceTest1._11d());
@@ -26,6 +26,7 @@ namespace SchoolManager
 
             superGroups.Add(PerformanceTest1._vtoriEzik12BV());
             superGroups.Add(PerformanceTest1._vtoriEzik11BV());
+            superGroups.Add(PerformanceTest1._vtoriEzik11AD());
 
             List<Multilesson>[] multilessons = new List<Multilesson>[5 + 1];
             for (int day = 1; day <= 5; day++)

@@ -339,6 +339,7 @@ namespace SchoolManager.Generation_utils
             
             rec(0, onlyConsequtive);
             //if (output != null) Console.WriteLine("opa naredihme gi");
+            //else Console.WriteLine("opa ne gi naredihme");
 
             //Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
             //sw.Stop();

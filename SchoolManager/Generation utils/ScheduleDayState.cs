@@ -38,12 +38,20 @@ namespace SchoolManager.Generation_utils
             return true;
         }
 
-        public bool updateLimits(int g, int s, int sign)
+        public bool updateLimitsNoTeacher(int g, int s, int sign)
         {
             groupLeftLessons[g] -= sign;
             groups[g].applySubject(s, sign);
 
             if (groupLeftLessons[g] < 0 || groups[g].getSubjectDayLim(s) < 0) return false;
+            return true;
+        }
+
+        public bool updateTeacherLimits(int t, int sign)
+        {
+            teacherLeftLessons[t] -= sign;
+
+            if (teacherLeftLessons[t] < 0) return false;
             return true;
         }
     }

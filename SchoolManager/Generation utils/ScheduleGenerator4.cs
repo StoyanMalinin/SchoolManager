@@ -105,7 +105,10 @@ namespace SchoolManager.Generation_utils
         List<Tuple<SuperGroup, int>>[] supergroupMultilessons = new List<Tuple<SuperGroup, int>>[workDays + 1];
         bool solveSuperGroup(int sgInd, int mInd, int weekLessons)
         {
-            if (weekLessons == 0) return arrangeSuperGroups(sgInd + 1);
+            if (weekLessons == 0)
+            {
+                return arrangeSuperGroups(sgInd + 1);
+            }
 
             bool res = false;
             if (mInd == superGroups[sgInd].requiredMultilessons.Count)
@@ -153,6 +156,9 @@ namespace SchoolManager.Generation_utils
         {
             if(sgInd==superGroups.Count)
             {
+                ScheduleGenerator3 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
+                if (sg.gen() == null) return false;
+
                 //Console.WriteLine("ANFANGEN");
                 return arrangeMultilessons(1, 0);
             }
