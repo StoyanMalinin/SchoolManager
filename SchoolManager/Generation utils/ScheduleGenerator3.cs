@@ -418,7 +418,7 @@ namespace SchoolManager.Generation_utils
                 ws.days[day] = dayRes;
             }
 
-            Console.WriteLine("davai volene");
+            //Console.WriteLine("davai volene");
 
             bool diagnosticsRes = runDiagnostics();
             //if (diagnosticsRes == false) Console.WriteLine("kurrrrr");

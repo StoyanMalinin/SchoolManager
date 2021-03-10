@@ -48,7 +48,7 @@ namespace SchoolManager.Generation_utils
             {
                 if (other.l.Count != l.Count) return false;
                 for (int i = 0; i < l.Count; i++)
-                    if (l[i] != other.l[i])
+                    if (l[i].Item1 != other.l[i].Item1)
                         return false;
 
                 return true;
@@ -213,7 +213,7 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            for(int gInd = g;gInd<state.Count;gInd++)
+            for(int gInd = g+1;gInd<state.Count;gInd++)
             {
                 if (teacherPermList[gInd].Any(tl => checkSuitable(tl, onlyConsequtive)==true)==false) return;
             }
@@ -221,46 +221,6 @@ namespace SchoolManager.Generation_utils
             IEnumerable<TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true);
             foreach (TeacherList tl in teacherLists)
             {
-                if (onlyConsequtive == true && tl.isGood == false) continue;
-
-                bool fail = false;
-                for (int lesson = 0; lesson < tl.l.Count; lesson++)
-                {
-                    if (isTeacherLocked[tl.l[lesson].Item1] == true && teacherPosLocked[lesson, tl.l[lesson].Item1] == false)
-                    {
-                        fail = true;
-                        break;
-                    }
-
-                    if (tl.l[lesson].Item1 < teachers.Count)
-                    {
-                        if (lessonTeacher[lesson, tl.l[lesson].Item1] > 0)
-                        {
-                            fail = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (isTeacherLocked[tl.l[lesson].Item1] == false)
-                        {
-                            int sgInd = Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
-                            foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
-                            {
-                                int tInd = teachers.FindIndex(x => x.Equals(t) == true);
-                                if (lessonTeacher[lesson, tInd] > 0)
-                                {
-                                    fail = true;
-                                    break;
-                                }
-                            }
-
-                            if (fail == true) break;
-                        }
-                    }
-                }
-                if (fail == true) continue;
-
                 solution[g] = tl.l;
                 for (int lesson = 0; lesson < tl.l.Count; lesson++)
                 {
@@ -278,7 +238,6 @@ namespace SchoolManager.Generation_utils
                     lessonTeacher[lesson, tl.l[lesson].Item1]++;
                 }
                     
-
                 rec(g + 1, onlyConsequtive);
 
                 solution[g] = null;
@@ -365,7 +324,7 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
-                //Console.WriteLine($"{g} -> {string.Join(" ", teacherList[g].Select(x => x.Item1))}");
+                //Console.WriteLine($"{g}: {string.Join(" ", teacherList[g].Select(x => x.Item1))} || {teacherPermList[g].Count}");
             }
         }
 
@@ -374,9 +333,16 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
             init();
+
+            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw.Start();
             
             rec(0, onlyConsequtive);
             //if (output != null) Console.WriteLine("opa naredihme gi");
+
+            //Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
+            //sw.Stop();
+
 
             return output;
         }

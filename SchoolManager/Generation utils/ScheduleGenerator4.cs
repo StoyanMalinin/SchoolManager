@@ -153,7 +153,7 @@ namespace SchoolManager.Generation_utils
         {
             if(sgInd==superGroups.Count)
             {
-                Console.WriteLine("ANFANGEN");
+                //Console.WriteLine("ANFANGEN");
                 return arrangeMultilessons(1, 0);
             }
 
