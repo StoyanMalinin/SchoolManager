@@ -185,12 +185,23 @@ namespace SchoolManager.School_Models
             return false;
         }
 
-        public int getBottleneck(int s)
+        public int getDayBottleneck(int s)
         {
             int bottleneck = int.MaxValue;
             foreach (int ind in subjectDayDependees[s])
             {
                 bottleneck = Math.Min(bottleneck, dayLims[ind].cnt);
+            }
+
+            return bottleneck;
+        }
+
+        public int getWeekBottleneck(int s)
+        {
+            int bottleneck = int.MaxValue;
+            foreach (int ind in subjectWeekDependees[s])
+            {
+                bottleneck = Math.Min(bottleneck, weekLims[ind].cnt);
             }
 
             return bottleneck;
@@ -210,7 +221,7 @@ namespace SchoolManager.School_Models
             return true;
         }
 
-        public void applySubject(int s, int sign)
+        public bool applySubject(int s, int sign)
         {
             if (sign == +1) curriculum.Add(subject2Teacher[s].Item1);
             else curriculum.Remove(subject2Teacher[s].Item1);
@@ -218,11 +229,15 @@ namespace SchoolManager.School_Models
             foreach (int ind in subjectDayDependees[s])
             {
                 dayLims[ind].cnt -= sign;
+                if (dayLims[ind].cnt < 0) return false;
             }
             foreach (int ind in subjectWeekDependees[s])
             {
                 weekLims[ind].cnt -= sign;
+                if (weekLims[ind].cnt < 0) return false; 
             }
+
+            return true;
         }
     }
 }

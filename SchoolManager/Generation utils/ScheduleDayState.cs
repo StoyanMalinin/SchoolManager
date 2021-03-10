@@ -32,18 +32,18 @@ namespace SchoolManager.Generation_utils
         {
             groupLeftLessons[g] -= sign;
             teacherLeftLessons[t] -= sign;
-            groups[g].applySubject(s, sign);
+            bool updateRes = groups[g].applySubject(s, sign);
 
-            if (groupLeftLessons[g] < 0 || teacherLeftLessons[t] < 0 || groups[g].getSubjectDayLim(s) < 0) return false;
+            if (groupLeftLessons[g] < 0 || teacherLeftLessons[t] < 0 || updateRes==false) return false;
             return true;
         }
 
         public bool updateLimitsNoTeacher(int g, int s, int sign)
         {
             groupLeftLessons[g] -= sign;
-            groups[g].applySubject(s, sign);
+            bool updateRes = groups[g].applySubject(s, sign);
 
-            if (groupLeftLessons[g] < 0 || groups[g].getSubjectDayLim(s) < 0) return false;
+            if (groupLeftLessons[g] < 0 || updateRes==false) return false;
             return true;
         }
 

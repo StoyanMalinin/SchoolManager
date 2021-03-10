@@ -353,7 +353,7 @@ namespace SchoolManager.Generation_utils
             {
                 for(int s = 0;s<dayState[1].groups[g].subject2Teacher.Count;s++)
                 {
-                    if (dayState[1].groups[g].getSubjectWeekLim(s) != 0)
+                    if (dayState[1].groups[g].getWeekBottleneck(s) != 0)
                         return false;
                 }
 
@@ -361,7 +361,7 @@ namespace SchoolManager.Generation_utils
                 {
                     for(int day = 1;day<=workDays;day++)
                     {                        
-                        if (dayState[day].groups[g].getSubjectDayLim(s) < 0)
+                        if (dayState[day].groups[g].getDayBottleneck(s) < 0)
                             return false;
                     }   
                 }
