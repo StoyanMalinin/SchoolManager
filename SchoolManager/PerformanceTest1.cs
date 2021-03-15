@@ -10,13 +10,13 @@ namespace SchoolManager
 {
     static class PerformanceTest1
     {
-        public static List<Subject> subjects;
-        public static List<LimitationGroup> limitationGroups;
-        public static List<Teacher> teachers;
+        private static List<Subject> subjects;
+        private static List<LimitationGroup> limitationGroups;
+        private static List<Teacher> teachers;
 
-        public static LimitationTreeNode higharchy = new LimitationTreeNode("root", null);
+        private static LimitationTreeNode higharchy = new LimitationTreeNode("root", null);
 
-        public static void init()
+        private static void init()
         {
             limitationGroups = new List<LimitationGroup>()
             {
@@ -88,7 +88,7 @@ namespace SchoolManager
         //общите LimitationGroup-и (точни, разказвателни)
         //когато са в weekLims, трябва да бъдат сложени на голямо число, за да не пречат
 
-        public static Group _12a()
+        private static Group _12a()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -132,19 +132,18 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
-                Tuple.Create(subjects[8], teachers[15]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("12a", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(1, 1)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
-            g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[15], subjects[8], new Generation_utils.IntInInterval(2, 2)));
 
             return g;
         }
 
-        public static Group _12b()
+        private static Group _12b()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -199,7 +198,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _12v()
+        private static Group _12v()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -254,7 +253,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _12g()
+        private static Group _12g()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -269,6 +268,7 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[7], 1),
                 Tuple.Create(limitationGroups[8], 1),
                 Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };  
 
             var weekLims = new List<Tuple<LimitationGroup, int>>()
@@ -276,14 +276,15 @@ namespace SchoolManager
                 Tuple.Create(limitationGroups[0], 6969),
                 Tuple.Create(limitationGroups[1], 6969),
 
-                Tuple.Create(limitationGroups[2], 6),
+                Tuple.Create(limitationGroups[2], 5),
                 Tuple.Create(limitationGroups[3], 2),
                 Tuple.Create(limitationGroups[4], 2),
                 Tuple.Create(limitationGroups[5], 4),
                 Tuple.Create(limitationGroups[6], 4),
                 Tuple.Create(limitationGroups[7], 2),
                 Tuple.Create(limitationGroups[8], 2),
-                Tuple.Create(limitationGroups[9], 3),
+                Tuple.Create(limitationGroups[9], 2),
+                Tuple.Create(limitationGroups[10], 2),
             };
 
             var subject2Teacher = new List<Tuple<Subject, Teacher>>()
@@ -296,6 +297,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[5], teachers[10]),
                 Tuple.Create(subjects[6], teachers[11]),
                 Tuple.Create(subjects[7], teachers[12]),
+                Tuple.Create(subjects[8], (Teacher)null),
             };
 
             Group g = new Group("12g", dayLims, weekLims, subject2Teacher);
@@ -306,7 +308,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _11a()
+        private static Group _11a()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -359,7 +361,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _11b()
+        private static Group _11b()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -414,7 +416,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _11v()
+        private static Group _11v()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -469,7 +471,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _10a()
+        private static Group _10a()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -521,7 +523,7 @@ namespace SchoolManager
             return g;
         }
 
-        public static Group _11d()
+        private static Group _11d()
         {
             var dayLims = new List<Tuple<LimitationGroup, int>>()
             {
@@ -576,7 +578,7 @@ namespace SchoolManager
             return g;
         }
     
-        public static SuperGroup _vtoriEzik12BV()
+        private static SuperGroup _vtoriEzik12BV()
         {
             List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
             {
@@ -596,7 +598,7 @@ namespace SchoolManager
             return sg;
         }
 
-        public static SuperGroup _vtoriEzik11BV()
+        private static SuperGroup _vtoriEzik11BV()
         {
             List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
             {
@@ -616,7 +618,7 @@ namespace SchoolManager
             return sg;
         }
 
-        public static SuperGroup _vtoriEzik11AD()
+        private static SuperGroup _vtoriEzik11AD()
         {
             List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
             {
@@ -634,6 +636,67 @@ namespace SchoolManager
             SuperGroup sg = new SuperGroup("vtori11AD", currGroups, currTeachers, 2, requiredMultilessons);
 
             return sg;
+        }
+
+        private static SuperGroup _vtoriEzik12AG()
+        {
+            List<Tuple<Group, Subject>> currGroups = new List<Tuple<Group, Subject>>()
+            {
+                Tuple.Create(_12a(), subjects[8]),
+                Tuple.Create(_12g(), subjects[8]),
+            };
+
+            List<Teacher> currTeachers = new List<Teacher>()
+            {
+                teachers[14],
+                teachers[15],
+            };
+
+            List<int> requiredMultilessons = new List<int>() { 2 };
+            SuperGroup sg = new SuperGroup("vtori12AG", currGroups, currTeachers, 2, requiredMultilessons);
+
+            return sg;
+        }
+
+        public static void test()
+        {
+            init();
+            List<Group> groups = new List<Group>();
+            List<SuperGroup> superGroups = new List<SuperGroup>();
+
+            groups.Add(_12a());
+            groups.Add(_12b());
+            groups.Add(_12v());
+            groups.Add(_12g());
+            groups.Add(_11a());
+            groups.Add(_11b());
+            groups.Add(_11v());
+            groups.Add(_11d());
+            groups.Add(_10a());
+
+            superGroups.Add(_vtoriEzik12BV());
+            superGroups.Add(_vtoriEzik11BV());
+            superGroups.Add(_vtoriEzik11AD());
+            superGroups.Add(_vtoriEzik12AG());
+
+            List<Generation_utils.Multilesson>[] multilessons = new List<Generation_utils.Multilesson>[5 + 1];
+            for (int day = 1; day <= 5; day++)
+                multilessons[day] = new List<Generation_utils.Multilesson>();
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
+            //multilessons[5].Add(new Multilesson(groups[7], PerformanceTest1.teachers[4], PerformanceTest1.subjects[4], new IntInInterval(2, 2)));
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[0], PerformanceTest1.subjects[0], new IntInInterval(1, 2)));
+            //multilessons[5].Add(new Multilesson(groups[0], PerformanceTest1.teachers[2], PerformanceTest1.subjects[3], new IntInInterval(1, 1)));
+            //multilessons[3].Add(new Multilesson(groups[2], PerformanceTest1.teachers[5], PerformanceTest1.subjects[0], new IntInInterval(2, 3)));
+
+            Generation_utils.ScheduleGenerator4 sg = new Generation_utils.ScheduleGenerator4(groups, teachers, subjects,
+                                                                                             higharchy, multilessons, superGroups);//за общи проблеми
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            sg.gen();
+            sw.Stop();
+
+            Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");
         }
     }
 }
