@@ -221,8 +221,9 @@ namespace SchoolManager.Generation_utils
                         //if (teachers[t].name== "gabarcheto") Console.WriteLine($"%%% {teachers[t].name} -> {dayState[day].groups[g].subject2Teacher[s].Item1.name} " +
                         //                                                       $"|| [{scheduledLessons.l}, {scheduledLessons.r}] || {important.Count}");
 
-                        if(important.Count>0) G.addEdge(teacherNode[t], groupSubjectNode[g, s], scheduledLessons.l, scheduledLessons.r);
-                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, maxLessons);
+                        //if (scheduledLessons.l != scheduledLessons.r) throw new Exception();
+                        if(important.Count>0) G.addEdge(teacherNode[t], groupSubjectNode[g, s], scheduledLessons.l, scheduledLessons.r, true);
+                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, maxLessons, true);
                     }
                 }
             }
@@ -244,11 +245,11 @@ namespace SchoolManager.Generation_utils
 
                         for (int d = day+1; d <= workDays; d++)
                         {
-                            List <Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g])==true 
-                                                                                 && m.s.Equals((x as SubjectTreeNode).s) == true).ToList();
+                            IEnumerable <Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g])==true 
+                                                                                 && m.s.Equals((x as SubjectTreeNode).s) == true);
                             
                             int rm = 0;
-                            if(important.Count==0)
+                            if(important.Any()==false)
                             {
                                 rm = Math.Min(dayState[d].groups[g].getSubjectDayLim(s), dayState[d].teacherLeftLessons[teacherInd]);
                                 rm = Math.Min(rm, dayState[d].groupLeftLessons[g]);
@@ -271,11 +272,12 @@ namespace SchoolManager.Generation_utils
                                                             .Sum(r => r.val.l);
                         }
 
-                        //if(groups[g].name=="12b")
-                        //    Console.WriteLine($"{(x as SubjectTreeNode).s.name} -> {Math.Max(0, lessonsLeft)} {Math.Min(subjectLim, dayState[day].groups[g].getSubjectWeekLim(s) - subjectDemand)}");
+                        int fixatedLessons = multilessons[day].Where(r => r.g.Equals(groups[g]) == true && r.s.Equals((x as SubjectTreeNode).s))
+                                                              .Sum(r => r.val.l);
+
                         groupSubjectEdge[g, s] = G.addEdge(x.nodeCode, x.parent.nodeCode, 
-                                                           Math.Max(0, lessonsLeft), Math.Min(subjectLim, dayState[day].groups[g].getSubjectWeekLim(s) - subjectDemand), 
-                                                           true);
+                                                           Math.Max(fixatedLessons, Math.Max(0, lessonsLeft)), 
+                                                           Math.Min(subjectLim, dayState[day].groups[g].getSubjectWeekLim(s) - subjectDemand));
                         
                         return;
                     }
@@ -286,8 +288,29 @@ namespace SchoolManager.Generation_utils
                         
                         if(x.GetType() == typeof(LimitationTreeNode))
                             lim = Math.Min(lim, dayState[day].groups[g].getLimGroupDayLim((x as LimitationTreeNode).lg));
-                        
-                        G.addEdge(x.nodeCode, x.parent.nodeCode, 0, lim);
+
+                        int lessonsLeft = groups[g].subject2Teacher.Where(t => t.Item1.limGroups.Contains((x as LimitationTreeNode).lg)==true)
+                                                                   .Sum(t => dayState[1].groups[g].getSubjectWeekLim(groups[g].findSubject(t.Item1)));
+
+                        for(int d = day+1;d<=workDays;d++)
+                        {
+                            IEnumerable<Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g]) == true
+                                                                                && m.s.limGroups.Contains((x as LimitationTreeNode).lg)==true);
+
+                            int rm = 0;
+                            if (important.Any() == false)
+                            {
+                                rm = Math.Min(dayState[d].groups[g].getLimGroupDayLim((x as LimitationTreeNode).lg), dayState[d].groupLeftLessons[g]);
+                            }
+                            else
+                            {
+                                rm = important.Sum(m => m.val.r);
+                            }
+
+                            lessonsLeft -= rm;
+                        }
+
+                        G.addEdge(x.nodeCode, x.parent.nodeCode, Math.Max(0, lessonsLeft), lim);
                     }
                         
                     foreach (TreeNode y in x.children)
@@ -382,6 +405,8 @@ namespace SchoolManager.Generation_utils
             return true;
         }
 
+        static int callNum = 0, succsefullCallNum = 0;
+
         public WeekSchedule gen()
         {
             WeekSchedule ws = new WeekSchedule(workDays);
@@ -389,6 +414,9 @@ namespace SchoolManager.Generation_utils
             initNodes();
             initArrays();
 
+            callNum++;
+            Console.WriteLine($"callNum: {callNum} || {(double)succsefullCallNum/(double)callNum}");
+            
             for (int day = 1; day <= workDays; day++)
             {
                 //Console.WriteLine($"supergroupMultilessons[{day}].Count = {supergroupMultilessons[day].Count}");
@@ -429,17 +457,11 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine("davai volene");
 
             bool diagnosticsRes = runDiagnostics();
-            //if (diagnosticsRes == false) Console.WriteLine("kurrrrr");
-            
-            /*
-            if(mode==true)
-            {
-                if (diagnosticsRes == true) Console.WriteLine("Kein problem!");
-                else Console.WriteLine("Es gibt ein problem!");
-            }
-            */
-            
             if (diagnosticsRes == false) return null;
+            
+            Console.WriteLine("davai volene");
+            succsefullCallNum++;
+
             return ws;
         }
     }

@@ -40,10 +40,10 @@ namespace SchoolManager
                 new Subject("geografiq", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[4] }),//2
                 new Subject("balgarski", new List<LimitationGroup>(){ limitationGroups[5]}),//3
                 new Subject("angliiski", new List<LimitationGroup>(){ limitationGroups[6]}),//4
-                new Subject("svqt i lichnost", new List<LimitationGroup>(){ limitationGroups[7]}),//5
-                new Subject("fizika", new List<LimitationGroup>(){ limitationGroups[8]}),//6
-                new Subject("fizichesko", new List<LimitationGroup>(){ limitationGroups[9]}),//7
-                new Subject("rosski/nemski", new List<LimitationGroup>(){ limitationGroups[10]}),//8
+                new Subject("svqt i lichnost", new List<LimitationGroup>(){ limitationGroups[1], limitationGroups[7]}),//5
+                new Subject("fizika", new List<LimitationGroup>(){ limitationGroups[0], limitationGroups[8]}),//6
+                new Subject("fizichesko", new List<LimitationGroup>(){ limitationGroups[9] }),//7
+                new Subject("rosski/nemski", new List<LimitationGroup>(){ limitationGroups[10] }),//8
             };
 
             teachers = new List<Teacher>()
@@ -70,14 +70,14 @@ namespace SchoolManager
             higharchy.addChild(new LimitationTreeNode(limitationGroups[1]));
             higharchy.addChild(new SubjectTreeNode(subjects[3]));
             higharchy.addChild(new SubjectTreeNode(subjects[4]));
-            higharchy.addChild(new SubjectTreeNode(subjects[5]));
-            higharchy.addChild(new SubjectTreeNode(subjects[6]));
             higharchy.addChild(new SubjectTreeNode(subjects[7]));
             higharchy.addChild(new SubjectTreeNode(subjects[8]));
             
             (higharchy.children[0] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[0]));
             (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[1]));
             (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[2]));
+            (higharchy.children[1] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[5]));
+            (higharchy.children[0] as LimitationTreeNode).addChild(new SubjectTreeNode(subjects[6]));
 
             //higharchy.printTree();
         }

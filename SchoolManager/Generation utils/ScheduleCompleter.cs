@@ -328,13 +328,15 @@ namespace SchoolManager.Generation_utils
             }
         }
 
+        System.Diagnostics.Stopwatch sw;
+
         public DaySchedule gen(bool onlyConsequtive = false)
         {
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
             init();
 
-            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw = new System.Diagnostics.Stopwatch();
             //sw.Start();
             
             rec(0, onlyConsequtive);
