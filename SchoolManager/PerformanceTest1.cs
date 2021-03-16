@@ -135,7 +135,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("12a", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "12a", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(1, 1)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
@@ -190,7 +190,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("12b", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "12b", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[5], subjects[0], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
@@ -245,7 +245,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("12v", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "12v", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[5], subjects[0], new Generation_utils.IntInInterval(2, 2)));
@@ -300,7 +300,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("12g", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "12g", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[5], subjects[0], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
@@ -355,7 +355,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("11a", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "11a", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
 
             return g;
@@ -408,7 +408,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("11b", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "11b", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(2, 2)));
@@ -463,7 +463,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("11v", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "11v", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[0], subjects[0], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[6], subjects[4], new Generation_utils.IntInInterval(2, 2)));
@@ -515,7 +515,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[7], teachers[13]),
             };
 
-            Group g = new Group("10a", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "10a", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[7], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[9], subjects[0], new Generation_utils.IntInInterval(2, 2)));
@@ -570,7 +570,7 @@ namespace SchoolManager
                 Tuple.Create(subjects[8], (Teacher)null),
             };
 
-            Group g = new Group("11d", dayLims, weekLims, subject2Teacher);
+            Group g = new Group(5, "11d", dayLims, weekLims, subject2Teacher);
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[2], subjects[3], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[4], subjects[4], new Generation_utils.IntInInterval(2, 2)));
             g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, teachers[5], subjects[0], new Generation_utils.IntInInterval(2, 2)));

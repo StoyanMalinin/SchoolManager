@@ -320,11 +320,25 @@ namespace SchoolManager.Generation_utils
                 dfs(groupHigharchy[g]);
             }
 
-            //connecting students to their higharchy trees
-            //for now the capacities will be simply maxLessons
+            //connecting groups to their higharchy trees
             for(int g = 0;g<groups.Count;g++)
             {
-                G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 0, dayState[day].groupLeftLessons[g]);
+                int allLeft = dayState[day].groups[g].subject2Teacher.Sum(t => dayState[day].groups[g].getSubjectWeekLim(dayState[day].groups[g].findSubject(t.Item1)));
+                for (int d = day + 1; d <= workDays; d++) allLeft -= dayState[d].groupLeftLessons[g];
+
+                int fixatedLessons = multilessons[day].Where(r => r.g.Equals(groups[g])==true).Sum(r => r.val.l);
+
+                //if(Math.Max(Math.Max(groups[g].minLessons, allLeft), fixatedLessons) > dayState[day].groupLeftLessons[g])
+                //    Console.WriteLine("KKkk");
+                G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 
+                          Math.Max(Math.Max(groups[g].minLessons - dayState[day].groups[g].curriculum.Count, allLeft), fixatedLessons), 
+                          dayState[day].groupLeftLessons[g]);
+            }
+
+            //connecting groups to allTeachersNode
+            for (int g = 0; g < groups.Count; g++)
+            {
+                G.addEdge(allTeachersNode, groupNode[g], 0, Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0));
             }
 
             G.eval();
@@ -352,7 +366,8 @@ namespace SchoolManager.Generation_utils
                     }
                 }
 
-                if (dayState[day].groups[g].curriculum.Count != maxLessons)
+                if (dayState[day].groups[g].curriculum.Count < dayState[day].groups[g].minLessons
+                    || dayState[day].groups[g].curriculum.Count > maxLessons)
                     return null;   
             }
 

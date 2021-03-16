@@ -32,11 +32,12 @@ namespace SchoolManager.School_Models
 
     class Group
     {
-        public string name { get; set; }
+        public int minLessons;
+        public string name;
 
         private List<LimitationGroupPair> dayLims;
         public List<LimitationGroupPair> weekLims { get; private set; }
-        public List<Tuple<Subject, Teacher>> subject2Teacher { get; set; }
+        public List<Tuple<Subject, Teacher>> subject2Teacher;
 
         public List<Multilesson> requiredMultilessons;
 
@@ -46,11 +47,12 @@ namespace SchoolManager.School_Models
         public List<Subject> curriculum; 
 
         public Group() { }
-        public Group(string name, List<Tuple<LimitationGroup, int>> dayLims,
-                                  List<Tuple<LimitationGroup, int>> weekLims,
-                                  List<Tuple<Subject, Teacher>> subject2Teacher)
+        public Group(int minLessons, string name, List<Tuple<LimitationGroup, int>> dayLims,
+                                                  List<Tuple<LimitationGroup, int>> weekLims,
+                                                  List<Tuple<Subject, Teacher>> subject2Teacher)
         {
             this.name = name;
+            this.minLessons = minLessons;
             this.curriculum = new List<Subject>();
             this.dayLims = dayLims.Select(x => new LimitationGroupPair(x)).ToList();
             this.weekLims = weekLims.Select(x => new LimitationGroupPair(x)).ToList();
@@ -94,10 +96,10 @@ namespace SchoolManager.School_Models
 
             this.requiredMultilessons = new List<Multilesson>();
         }
-        public Group(string name, List<Tuple<LimitationGroup, int>> dayLims,
-                                  List<Tuple<LimitationGroup, int>> weekLims,
-                                  List<Tuple<Subject, Teacher>> subject2Teacher, 
-                                  List <Multilesson> requiredMultilessons) : this(name, dayLims, weekLims, subject2Teacher)
+        public Group(int minLessons, string name, List<Tuple<LimitationGroup, int>> dayLims,
+                                     List<Tuple<LimitationGroup, int>> weekLims,
+                                     List<Tuple<Subject, Teacher>> subject2Teacher, 
+                                     List <Multilesson> requiredMultilessons) : this(minLessons, name, dayLims, weekLims, subject2Teacher)
         {
             this.requiredMultilessons = requiredMultilessons;
         }
@@ -136,6 +138,7 @@ namespace SchoolManager.School_Models
             Group output = new Group();
 
             output.name = name;
+            output.minLessons = minLessons;
             output.subject2Teacher = subject2Teacher;
 
             output.curriculum = curriculum.Select(x => x).ToList();
@@ -158,6 +161,7 @@ namespace SchoolManager.School_Models
             Group output = new Group();
 
             output.name = name;
+            output.minLessons = minLessons;
             output.subject2Teacher = subject2Teacher;
 
             output.dayLims = dayLims.Select(x => x.Clone()).ToList();
