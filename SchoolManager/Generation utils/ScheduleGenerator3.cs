@@ -11,7 +11,7 @@ namespace SchoolManager.Generation_utils
     class ScheduleGenerator3
     {
         const int workDays = 5;
-        const int maxLessons = 5;
+        const int maxLessons = 7;
 
         private List<Group> groups;
         private List<Teacher> teachers;
@@ -198,10 +198,10 @@ namespace SchoolManager.Generation_utils
                 int u = allTeachersNode;
                 int v = teacherNode[t];
                 int l = Math.Max(requested, 0);
-                int c = maxLessons;
+                int c = dayState[day].teacherLeftLessons[t];
 
                 //Console.WriteLine($"{teachers[t].name} -> {l} {c}");
-                G.addEdge(u, v, l, c);
+                G.addEdge(u, v, l, Math.Min(c, 6));
             }
 
             //connecting teachers to possible lessons
@@ -328,17 +328,22 @@ namespace SchoolManager.Generation_utils
 
                 int fixatedLessons = multilessons[day].Where(r => r.g.Equals(groups[g])==true).Sum(r => r.val.l);
 
+                int upperBound = dayState[day].groups[g].subject2Teacher.Sum(t => dayState[day].groups[g].getSubjectWeekLim(dayState[day].groups[g].findSubject(t.Item1)));
+                for (int d = day + 1; d <= workDays; d++) upperBound -= Math.Min(dayState[d].groupLeftLessons[g], groups[g].minLessons);
+
                 //if(Math.Max(Math.Max(groups[g].minLessons, allLeft), fixatedLessons) > dayState[day].groupLeftLessons[g])
                 //    Console.WriteLine("KKkk");
                 G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 
                           Math.Max(Math.Max(groups[g].minLessons - dayState[day].groups[g].curriculum.Count, allLeft), fixatedLessons), 
-                          dayState[day].groupLeftLessons[g]);
+                          Math.Min(dayState[day].groupLeftLessons[g], upperBound));
+
+                //if (g == 0) Console.WriteLine($"upperBound = {upperBound}");
             }
 
             //connecting groups to allTeachersNode
             for (int g = 0; g < groups.Count; g++)
             {
-                G.addEdge(allTeachersNode, groupNode[g], 0, Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0));
+                G.addEdge(allTeachersNode, groupNode[g], 0, Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0), true);
             }
 
             G.eval();
@@ -353,7 +358,7 @@ namespace SchoolManager.Generation_utils
                 for (int s = 0; s < groups[g].subject2Teacher.Count; s++)
                 {
                     if (groups[g].subject2Teacher[s].Item2 is null) continue;
-
+                        
                     for (int i = 0; i < G.getEdge(groupSubjectEdge[g, s]); i++)
                     {
                         teacherInds.Add(groupSubject2Teacher[g, s]);
@@ -361,6 +366,7 @@ namespace SchoolManager.Generation_utils
 
                         if (dayState[day].updateLimits(g, s, groupSubject2Teacher[g, s], +1) == false)
                         {
+                            Console.WriteLine($"ebalo si maikata {g}");
                             return null;
                         }
                     }
@@ -368,9 +374,14 @@ namespace SchoolManager.Generation_utils
 
                 if (dayState[day].groups[g].curriculum.Count < dayState[day].groups[g].minLessons
                     || dayState[day].groups[g].curriculum.Count > maxLessons)
-                    return null;   
+                {
+                    Console.WriteLine($"e de {dayState[day].groups[g].curriculum.Count} {g}");
+                    return null;
+                }
+                       
             }
 
+            Console.WriteLine("pak faida e ");
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
 
             DaySchedule ds = sc.gen(true);
@@ -447,14 +458,22 @@ namespace SchoolManager.Generation_utils
                             int s = groups[g].findSubject(tup.Item2);
 
                             if (dayState[day].updateLimitsNoTeacher(g, s, +1) == false)
-                                return null;   
+                            {
+                                Console.WriteLine("bez tichar");
+                                return null;
+                            }
+                                   
                         }
 
                         foreach (Teacher t in item.Item1.teachers)
                         {
                             int tInd = teachers.FindIndex(x => x.Equals(t) == true);
                             if (dayState[day].updateTeacherLimits(tInd, +1) == false)
+                            {
+                                Console.WriteLine("s tichar");
                                 return null;
+                            }
+                                
                         }
                     }
                 }
@@ -462,14 +481,12 @@ namespace SchoolManager.Generation_utils
 
             for (int day = 1;day<=workDays;day++)
             {
-                //Console.WriteLine($"---{day}");
                 DaySchedule dayRes = generateDay(day);
 
                 if (dayRes == null) return null;
                 ws.days[day] = dayRes;
+                Console.WriteLine($"---{day}");
             }
-
-            //Console.WriteLine("davai volene");
 
             bool diagnosticsRes = runDiagnostics();
             if (diagnosticsRes == false) return null;

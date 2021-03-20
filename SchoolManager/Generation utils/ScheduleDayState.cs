@@ -34,6 +34,7 @@ namespace SchoolManager.Generation_utils
             teacherLeftLessons[t] -= sign;
             bool updateRes = groups[g].applySubject(s, sign);
 
+            //Console.WriteLine($"{groupLeftLessons[g]} || {teacherLeftLessons[t]} || {updateRes}");
             if (groupLeftLessons[g] < 0 || teacherLeftLessons[t] < 0 || updateRes==false) return false;
             return true;
         }

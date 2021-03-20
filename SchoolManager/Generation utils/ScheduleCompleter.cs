@@ -199,6 +199,8 @@ namespace SchoolManager.Generation_utils
 
         private void rec(int g, bool onlyConsequtive)
         {
+            //if (sw.ElapsedMilliseconds > 20 * 1000) return;
+
             if (output != null) return;
             if (g == state.Count)
             {
@@ -219,6 +221,8 @@ namespace SchoolManager.Generation_utils
             }
 
             IEnumerable<TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true);
+            //Console.WriteLine($"{g} -> {teacherLists.ToList().Count}");
+
             foreach (TeacherList tl in teacherLists)
             {
                 solution[g] = tl.l;
@@ -324,10 +328,16 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
-                //Console.WriteLine($"{g}: {string.Join(" ", teacherList[g].Select(x => x.Item1))} || {teacherPermList[g].Count}");
+                
+                //Console.WriteLine($"{g}: {string.Join(" ", teacherList[g].Select(x => x.Item1))} || {teacherPermList[g].Count(t => t.isGood==true)}");
+                
+                //if(teacherPermList[g].Count(t => t.isGood == true)<=100) 
+                //    Console.WriteLine(string.Join("\n", teacherPermList[g].Where(p => p.isGood == true).Select(p => string.Join(" ", p.l.Select(t => t.Item1)))));
+                
             }
         }
 
+        private static HashSet<string> failedConfigs = new HashSet<string>();
         System.Diagnostics.Stopwatch sw;
 
         public DaySchedule gen(bool onlyConsequtive = false)
@@ -336,16 +346,20 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine(state.Count);
             init();
 
-            //sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
+            string str = string.Join("|", Enumerable.Range(0, state.Count).Select(gInd => string.Join(" ", teacherList[gInd].Select(x => x.Item2.name))));
+            if (failedConfigs.Contains(str) == true) return null;
+
+            sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
             
             rec(0, onlyConsequtive);
             //if (output != null) Console.WriteLine("opa naredihme gi");
             //else Console.WriteLine("opa ne gi naredihme");
 
             //Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
-            //sw.Stop();
+            sw.Stop();
 
+            if (output == null) failedConfigs.Add(str);
 
             return output;
         }

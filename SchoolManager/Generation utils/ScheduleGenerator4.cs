@@ -102,7 +102,10 @@ namespace SchoolManager.Generation_utils
             return res;
         }
 
+
+        bool[,] freeSupergroupMultilessonsAdded;
         List<Tuple<SuperGroup, int>>[] supergroupMultilessons = new List<Tuple<SuperGroup, int>>[workDays + 1];
+        
         bool solveSuperGroup(int sgInd, int mInd, int weekLessons)
         {
             if (weekLessons == 0)
@@ -115,6 +118,9 @@ namespace SchoolManager.Generation_utils
             {
                 for (int day = 1; day <= workDays; day++)
                 {
+                    if (freeSupergroupMultilessonsAdded[sgInd, day] == true) continue;
+
+                    freeSupergroupMultilessonsAdded[sgInd, day] = true;
                     for (int lessons = 1; lessons <= weekLessons; lessons++)
                     {
                         supergroupMultilessons[day].Add(Tuple.Create(superGroups[sgInd], lessons));
@@ -127,6 +133,7 @@ namespace SchoolManager.Generation_utils
 
                         supergroupMultilessons[day].RemoveAt(supergroupMultilessons[day].Count - 1);
                     }
+                    freeSupergroupMultilessonsAdded[sgInd, day] = false;
 
                     if (res == true) break;
                 }
@@ -187,7 +194,12 @@ namespace SchoolManager.Generation_utils
                 dayState[day] = new ScheduleDayState(refList.Select(g => g.ClonePartial(g.weekLims)).ToList(), teachers, maxLessons);
             }
 
-            for (int day = 1; day <= workDays; day++) supergroupMultilessons[day] = new List<Tuple<SuperGroup, int>>();
+            freeSupergroupMultilessonsAdded = new bool[superGroups.Count, workDays + 1];
+            for (int day = 1; day <= workDays; day++)
+            {
+                for(int i = 0;i<superGroups.Count;i++) freeSupergroupMultilessonsAdded[i, day] = false;
+                supergroupMultilessons[day] = new List<Tuple<SuperGroup, int>>();
+            }
 
             Console.WriteLine($"allMultilessons = {allMultilessons.Count}");
             bool res = arrangeSuperGroups(0);

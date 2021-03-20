@@ -31,6 +31,7 @@ namespace SchoolManager
                 new LimitationGroup("fizika"),//8
                 new LimitationGroup("fizichesko"),//9
                 new LimitationGroup("rosski/nemski"),//10
+                new LimitationGroup("kur"),//11
             };
 
             subjects = new List<Subject>()

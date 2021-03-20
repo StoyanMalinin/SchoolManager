@@ -10,8 +10,8 @@ namespace SchoolManager
     {
         static void Main(string[] args)
         {
-            PerformanceTest1.test();
-            while (true) ;
+            PerformanceTestPMGHaskovo.test("Programa-2019-2020-I-srok");
+            //PerformanceTest1.test();
         }
     }
 }

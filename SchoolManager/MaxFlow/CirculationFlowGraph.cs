@@ -79,6 +79,7 @@ namespace SchoolManager.MaxFlow
         public int addEdge(int u, int v, int l, int c, bool progressiveCost)
         {
             if(l==c) progressiveCost = false;
+            //if (l > c) throw new Exception();
 
             edges.Add(new CirculationEdge(u, v, l, c, progressiveCost));
             return edges.Count - 1;
