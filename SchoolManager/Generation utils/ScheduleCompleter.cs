@@ -507,7 +507,7 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine(state.Count);
             init();
 
-            Console.WriteLine(calculated.Count);
+            //Console.WriteLine(calculated.Count);
             string str = string.Join("|", Enumerable.Range(0, state.Count).Select(gInd => string.Join(" ", teacherList[gInd].Select(x => x.Item2.name))));
             if (calculated.ContainsKey(str) == true) return calculated[str];
 
@@ -518,7 +518,7 @@ namespace SchoolManager.Generation_utils
             //if (output != null) Console.WriteLine("opa naredihme gi");
             //else Console.WriteLine("opa ne gi naredihme");
 
-            Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
+            //Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
             sw.Stop();
 
             calculated[str] = output;

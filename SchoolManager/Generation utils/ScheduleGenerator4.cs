@@ -164,15 +164,16 @@ namespace SchoolManager.Generation_utils
             {
                 //for (int day = 1; day <= workDays; day++)
                 //{
+                mInd = supergroupMultilessons[day].Count(x => x.Item1.Equals(superGroups[sgInd]));
                 if (superGroups[sgInd].weekLessons >= superGroups[sgInd].requiredMultilessons[mInd])
                 {
                     supergroupMultilessons[day].Add(Tuple.Create(superGroups[sgInd], superGroups[sgInd].requiredMultilessons[mInd]));
-
 
                     if (solveSuperGroup(day, sgInd, mInd + 1) == true)
                     {
                         res = true;
                     }
+
                     supergroupMultilessons[day].RemoveAt(supergroupMultilessons[day].Count - 1);
                 }
             }
