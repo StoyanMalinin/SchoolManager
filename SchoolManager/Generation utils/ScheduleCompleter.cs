@@ -134,7 +134,7 @@ namespace SchoolManager.Generation_utils
         private List<Tuple<int, Subject>>[] solution;
 
         private List<Tuple <int, Subject>>[] teacherList;
-        private HashSet<TeacherList>[] teacherPermList;
+        private IEnumerable<TeacherList>[] teacherPermList;
 
         private int[] superTeacherInd;
         private List<int>[] teacherDependees;
@@ -196,7 +196,7 @@ namespace SchoolManager.Generation_utils
             return state;
         }
 
-        private HashSet<TeacherList> genPerms(List<Tuple <int, Subject>> l)
+        private List<TeacherList> genPerms(List<Tuple <int, Subject>> l)
         {
             List<Tuple<int, Subject>> curr = new List<Tuple<int, Subject>>();
             HashSet<TeacherList> ans = new HashSet<TeacherList>();
@@ -233,7 +233,7 @@ namespace SchoolManager.Generation_utils
             }
 
             rec(0);
-            return ans;
+            return ans.ToList();
         }
 
         private bool checkSuitable(TeacherList tl, bool onlyConsequtive, TeacherSelection ts = null)
@@ -305,7 +305,7 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            if (sw.ElapsedMilliseconds > 0.5 * 1000) return;
+            if (sw.ElapsedMilliseconds > 1 * 1000) return;
 
             long[] skeletonStates = new long[teacherSelections.Count];
             for(int i = 0;i<skeletonStates.Length;i++) skeletonStates[i] = getState(teacherSelections[i]);
@@ -405,11 +405,11 @@ namespace SchoolManager.Generation_utils
             }
         }
 
-        private void init()
+        private void init(bool onlyConsequtive)
         {
             solution = new List<Tuple<int, Subject>>[teachers.Count];
             teacherList = new List<Tuple<int, Subject>>[state.Count];
-            teacherPermList = new HashSet<TeacherList>[state.Count];
+            teacherPermList = new IEnumerable<TeacherList>[state.Count];
             lessonTeacher = new int[maxLessons + 1, teachers.Count + supergroupMultilessons.Count + 1];
             superTeacherInd = new int[supergroupMultilessons.Count];
             teacherDependees = new List<int>[teachers.Count + supergroupMultilessons.Count + 1];
@@ -484,14 +484,13 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
-                //Console.WriteLine($"{g}: {string.Join(" ", teacherList[g].Select(x => x.Item1))} || {teacherPermList[g].Count(t => t.isGood==true)}");                
+                teacherPermList[g] = teacherPermList[g].Where(t => t.isGood == true || onlyConsequtive == false);
             }
 
             teacherSelections = new List<TeacherSelection>();
             List <int> sortedTeachers = Enumerable.Range(0, teachers.Count).OrderByDescending(ind => teacherList
             .Sum(tl => tl.Count(x => ((x.Item1<teachers.Count && x.Item1==ind) || 
-            (x.Item1>=teachers.Count && supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count).First(i => superTeacherInd[i] == x.Item1)].Item1.teachers
-            .Any(y => y.Equals(teachers[ind])==true)))))).ToList(); 
+            (x.Item1>=teachers.Count))))).ToList(); 
 
             for (int i = 0; i < 10; i++) 
                 teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[i]}));
@@ -505,9 +504,9 @@ namespace SchoolManager.Generation_utils
         {
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
-            init();
+            init(onlyConsequtive);
 
-            //Console.WriteLine(calculated.Count);
+            Console.WriteLine(calculated.Count);
             string str = string.Join("|", Enumerable.Range(0, state.Count).Select(gInd => string.Join(" ", teacherList[gInd].Select(x => x.Item2.name))));
             if (calculated.ContainsKey(str) == true) return calculated[str];
 
