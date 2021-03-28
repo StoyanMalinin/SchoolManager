@@ -201,7 +201,7 @@ namespace SchoolManager.Generation_utils
                 int c = dayState[day].teacherLeftLessons[t];
 
                 //Console.WriteLine($"{teachers[t].name} -> {l} {c}");
-                G.addEdge(u, v, l, Math.Min(c, 6));
+                G.addEdge(u, v, l, Math.Min(c, 6), true);
             }
 
             //connecting teachers to possible lessons
@@ -223,7 +223,7 @@ namespace SchoolManager.Generation_utils
 
                         //if (scheduledLessons.l != scheduledLessons.r) throw new Exception();
                         if(important.Count>0) G.addEdge(teacherNode[t], groupSubjectNode[g, s], scheduledLessons.l, scheduledLessons.r, true);
-                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, maxLessons, true);
+                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, 6, true);
                     }
                 }
             }
@@ -343,14 +343,14 @@ namespace SchoolManager.Generation_utils
             //connecting groups to allTeachersNode
             for (int g = 0; g < groups.Count; g++)
             {
-                G.addEdge(allTeachersNode, groupNode[g], 0, Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0), true);
+                G.addEdge(allTeachersNode, groupNode[g], 0, 1);//Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0));
             }
 
             G.eval();
 
             for(int g = 0;g<groups.Count;g++)
             {
-                //Console.WriteLine($"---- {groups[g].name} ---");
+                //Console.WriteLine($"---- {groups[g].name} - {g} ---");
 
                 int expectedCnt = dayState[day].groupLeftLessons[g];
                 List<int> teacherInds = new List<int>();
@@ -375,7 +375,7 @@ namespace SchoolManager.Generation_utils
                 if (dayState[day].groups[g].curriculum.Count < dayState[day].groups[g].minLessons
                     || dayState[day].groups[g].curriculum.Count > maxLessons)
                 {
-                    Console.WriteLine($"e de {dayState[day].groups[g].curriculum.Count} {g}");
+                    Console.WriteLine($"e de {dayState[day].groups[g].curriculum.Count} {g} || {day}");
                     return null;
                 }
                        
@@ -433,8 +433,9 @@ namespace SchoolManager.Generation_utils
 
         static int callNum = 0, succsefullCallNum = 0;
 
-        public WeekSchedule gen()
+        public WeekSchedule gen(int limDay, bool isFinal)
         {
+            if (limDay == -1) limDay = workDays;
             WeekSchedule ws = new WeekSchedule(workDays);
 
             initNodes();
@@ -443,7 +444,7 @@ namespace SchoolManager.Generation_utils
             callNum++;
             Console.WriteLine($"callNum: {callNum} || {(double)succsefullCallNum/(double)callNum}");
             
-            for (int day = 1; day <= workDays; day++)
+            for (int day = 1; day <= limDay; day++)
             {
                 //Console.WriteLine($"supergroupMultilessons[{day}].Count = {supergroupMultilessons[day].Count}");
                 foreach (var item in supergroupMultilessons[day])
@@ -459,7 +460,7 @@ namespace SchoolManager.Generation_utils
 
                             if (dayState[day].updateLimitsNoTeacher(g, s, +1) == false)
                             {
-                                Console.WriteLine("bez tichar");
+                                Console.WriteLine($"bez tichar {g} {dayState[day].groupLeftLessons[g]} {string.Join(",", dayState[day].groups[g].curriculum.Select(s => s.name))}");
                                 return null;
                             }
                                    
@@ -479,17 +480,17 @@ namespace SchoolManager.Generation_utils
                 }
             }
 
-            for (int day = 1;day<=workDays;day++)
+            for (int day = 1;day<=limDay;day++)
             {
                 DaySchedule dayRes = generateDay(day);
 
                 if (dayRes == null) return null;
                 ws.days[day] = dayRes;
-                Console.WriteLine($"---{day}");
+                //Console.WriteLine($"---{day}");
             }
 
             bool diagnosticsRes = runDiagnostics();
-            if (diagnosticsRes == false) return null;
+            if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;//throw new Exception();
             
             Console.WriteLine("davai volene");
             succsefullCallNum++;

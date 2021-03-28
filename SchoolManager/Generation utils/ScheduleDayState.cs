@@ -19,7 +19,7 @@ namespace SchoolManager.Generation_utils
             this.teacherLeftLessons = new int[teachers.Count];
 
             for (int i = 0; i < groups.Count; i++) this.groupLeftLessons[i] = maxLessons;
-            for (int i = 0; i < teachers.Count; i++) this.teacherLeftLessons[i] = maxLessons;
+            for (int i = 0; i < teachers.Count; i++) this.teacherLeftLessons[i] = 6;
         }
 
         public bool check(int g, int s, int t, int change)

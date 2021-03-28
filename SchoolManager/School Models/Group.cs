@@ -230,6 +230,7 @@ namespace SchoolManager.School_Models
             if (sign == +1) curriculum.Add(subject2Teacher[s].Item1);
             else curriculum.Remove(subject2Teacher[s].Item1);
 
+            //Console.WriteLine(subjectDayDependees[s].Count);
             foreach (int ind in subjectDayDependees[s])
             {
                 dayLims[ind].cnt -= sign;

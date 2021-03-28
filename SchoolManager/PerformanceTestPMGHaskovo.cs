@@ -15,7 +15,7 @@ namespace SchoolManager
     static class PerformanceTestPMGHaskovo
     {
         private static int workDays = 5;
-        private static int groupsCnt = 7;
+        private static int groupsCnt = 28;
 
         class SuperGroupExcell : IEquatable<SuperGroupExcell>
         {
@@ -226,11 +226,11 @@ namespace SchoolManager
 
                     var weekLims = limitationGroups.Select(lg => Tuple.Create(lg, allSubjects.Count(x => x==lg.name))).ToList();
 
-                    var dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 6))).ToList();
+                    var dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).ToList();
 
                     Console.WriteLine($"{gName} -> {string.Join(", ", subject2TeacherName)}");
-                    Console.WriteLine(string.Join("\n", weekLims.Select(t => $"{t.Item1.name} -> {t.Item2}")));
-                    subject2Teacher.ForEach(x => Console.WriteLine($"{x.Item1.name} - {((x.Item2 is null)?"null":x.Item2.name)}"));
+                   // Console.WriteLine(string.Join("\n", weekLims.Select(t => $"{t.Item1.name} -> {t.Item2}")));
+                    //subject2Teacher.ForEach(x => Console.WriteLine($"{x.Item1.name} - {((x.Item2 is null)?"null":x.Item2.name)}"));
                     Console.WriteLine();
 
                     groups.Add(new Group(6, gName, dayLims, weekLims, subject2Teacher));
@@ -273,9 +273,10 @@ namespace SchoolManager
             for(int i = 0;i<excellSuperGroups.Count;i++)
             {
                 SuperGroup sg = new SuperGroup(i.ToString(), excellSuperGroups[i].groups.Select(t => Tuple.Create(groups.First(g => g.name == t.Item1), subjects.First(s => s.name == t.Item2))).ToList(),
-                                               excellSuperGroups[i].teachers.Select(t => teachers.First(x => x.name==t)).ToList(), excellSuperGroups[i].positions.Count, new List<int>() { });
+                                               excellSuperGroups[i].teachers.Select(t => teachers.First(x => x.name==t)).ToList(), excellSuperGroups[i].positions.Count/excellSuperGroups[i].groups.Count, new List<int>() { });
 
                 superGroups.Add(sg);
+                Console.WriteLine($"{string.Join(", ", excellSuperGroups[i].groups)} -> {sg.weekLessons}");
             }
 
             subjects.ForEach(s => higharchy.addChild(new SubjectTreeNode(s)));
@@ -292,7 +293,13 @@ namespace SchoolManager
             Generation_utils.ScheduleGenerator4 sg = new Generation_utils.ScheduleGenerator4(groups, teachers, subjects,
                                                                                              higharchy, multilessons, superGroups);
 
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
             sg.gen();
+            
+            System.Console.WriteLine($"Total ellapsed time = {sw.ElapsedMilliseconds}");
+            sw.Stop();
         }
     }
 }
