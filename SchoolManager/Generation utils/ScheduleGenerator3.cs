@@ -163,7 +163,33 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
+
+            if(memo is null)
+            {
+                memo = new Dictionary<string, DaySchedule>[workDays+1];
+                for(int day = 1;day<=workDays;day++) 
+                    memo[day] = new Dictionary<string, DaySchedule>();
+            }
+            
         }
+
+        private static Dictionary <string, DaySchedule>[] memo = null;
+        private string getState(int day)
+        {
+            string state = "";
+            foreach(Group g in dayState[1].groups) state += string.Join("$", g.weekLims.Select(x => x.cnt)) + "|";
+            state += "||";
+
+            for(int d = day;d<=workDays;d++)
+            {
+                state += string.Join("", multilessons[d].Select(m => $"({m.g.name}, {m.s.name}, {m.val})")) + "|";
+                state += string.Join("", supergroupMultilessons[d].Select(sg => $"({sg.Item1.name}, {sg.Item2})"));
+                state += "!";
+            }
+
+            return state;
+        }
+
 
         private DaySchedule generateDay(int day)
         {
@@ -385,8 +411,6 @@ namespace SchoolManager.Generation_utils
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
 
             DaySchedule ds = sc.gen(true);
-            if (ds is null) return null;
-
             return ds;
         }
 

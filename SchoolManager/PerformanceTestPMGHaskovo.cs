@@ -182,7 +182,7 @@ namespace SchoolManager
 
         private static List <Group> getGroups(string filename, List <SuperGroupExcell> superGroupExcells, 
                                               List <Subject> subjects, List <Teacher> teachers,
-                                              List <LimitationGroup> limitationGroups)
+                                              List <LimitationGroup> limitationGroups, List <string> subjectNames)
         {
             List<Group> groups = new List<Group>();
 
@@ -224,14 +224,31 @@ namespace SchoolManager
                                                           ((subject2TeacherName.Any(x => x.Item1 == s.name) == false) ? null 
                                                           : teachers.First(t => t.name== subject2TeacherName.First(x => x.Item1 == s.name).Item2)))).ToList();
 
-                    var weekLims = limitationGroups.Select(lg => Tuple.Create(lg, allSubjects.Count(x => x==lg.name))).ToList();
+                    //var weekLims = limitationGroups.Select(lg => Tuple.Create(lg, allSubjects.Count(x => x==lg.name))).ToList();
+                    System.Console.WriteLine(string.Join("|", allSubjects));
+                    List <Tuple <LimitationGroup, int>> weekLims = new List<Tuple<LimitationGroup, int>>();
+                    foreach(LimitationGroup lg in limitationGroups)
+                    {
+                        if(subjectNames.Any(s => s==lg.name)==false) 
+                        {
+                            System.Console.WriteLine($"am ai sq de {lg.name}");
+                            weekLims.Add(Tuple.Create(lg, 6969));
+                        }
+                        else weekLims.Add(Tuple.Create(lg, allSubjects.Count(x => x==lg.name)));
+                    }
+                    
+                    List <Tuple<LimitationGroup, int>> dayLims;
+                    if(gName.Length<=3 && gName[0]!='8' && gName.Last()!='д') 
+                    {
+                        dayLims = dayLimsGeneral;
+                        System.Console.WriteLine($"{gName} sa generali");
+                    }
+                    else dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).ToList();
 
-                    var dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).Reverse().ToList();
-
-                    Console.WriteLine($"{gName} -> {string.Join(", ", subject2TeacherName)}");
+                    //Console.WriteLine($"{gName} -> {string.Join(", ", subject2TeacherName)}");
                    // Console.WriteLine(string.Join("\n", weekLims.Select(t => $"{t.Item1.name} -> {t.Item2}")));
                     //subject2Teacher.ForEach(x => Console.WriteLine($"{x.Item1.name} - {((x.Item2 is null)?"null":x.Item2.name)}"));
-                    Console.WriteLine();
+                    //Console.WriteLine();
 
                     groups.Add(new Group(6, gName, dayLims, weekLims, subject2Teacher));
                 }
@@ -247,6 +264,69 @@ namespace SchoolManager
         private static List<Group> groups;
         private static LimitationTreeNode higharchy = new LimitationTreeNode("root", null);
 
+        private static List <Tuple <LimitationGroup, int>> dayLimsGeneral;
+
+        private static void loadDayLimsGeneral()
+        {
+            dayLimsGeneral = new List<Tuple<LimitationGroup, int>>();
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("to4ni"), 3));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("математика"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("?? - ри чужд език"), 2));
+
+            foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsGeneral.Any(t => t.Item1.name==x.name)==false))
+                dayLimsGeneral.Add(Tuple.Create(new LimitationGroup(s.name), 2));
+        }
+
+        private static void loadDayLims()
+        {
+            loadDayLimsGeneral();
+        }
+
+        private static void loadHigharcy()
+        {
+            limitationGroups.Where(lg => subjects.Any(s => s.name==lg.name)==false).ToList().ForEach(lg => higharchy.addChild(new LimitationTreeNode(lg)));
+            //subjects.ForEach(s => higharchy.addChild(new SubjectTreeNode(s)));
+            
+            Dictionary <string, string> subject2LimGroup = new Dictionary<string, string>();
+            subject2LimGroup.Add("математика", "tochni");
+            subject2LimGroup.Add("география", "razkazvatelni");
+            subject2LimGroup.Add("английски език", "ezici");
+            subject2LimGroup.Add("БЕЛ", "razkazvatelni");
+
+            foreach(Subject s in subjects)
+            {
+                TreeNode dfs(TreeNode x, string name)
+                {
+                    if(x.GetType()==typeof(LimitationTreeNode) && (x as LimitationTreeNode).name==name) return x;
+
+                    TreeNode res = null;
+                    foreach(TreeNode y in x.children)
+                    {
+                        TreeNode curr = dfs(y, name);
+                        if(!(curr is null)) 
+                        {
+                            res = curr;
+                            break;
+                        }
+                    }
+
+                    return res;
+                }
+
+                TreeNode node = null;
+                if(subject2LimGroup.ContainsKey(s.name)==true) node = dfs(higharchy, subject2LimGroup[s.name]);
+
+                if(node==null) node = higharchy;
+
+                System.Console.WriteLine($"{s.name} --> {node.name}");
+                (node as LimitationTreeNode).addChild(new SubjectTreeNode(s));
+            }
+        }
+
         private static void loadSchedule(string filename)
         {
             List<SuperGroupExcell> excellSuperGroups = getSuperGroups(filename).ToList();   
@@ -257,7 +337,7 @@ namespace SchoolManager
 
             List<string> subjectNames = getSubjects(filename);
             Console.WriteLine($"subjectsCnt = {subjectNames.Count}");
-            Console.WriteLine(string.Join(", ", subjectNames));
+            Console.WriteLine(string.Join("\n", subjectNames));
             Console.WriteLine();
 
             List<string> teacherNames = getTeachers(filename);
@@ -265,10 +345,16 @@ namespace SchoolManager
             Console.WriteLine(string.Join(", ", teacherNames));
             Console.WriteLine();
 
-            teachers = teacherNames.Select(t => new Teacher(t, new List<Subject>() { })).ToList();
             limitationGroups = subjectNames.Select(s => new LimitationGroup(s)).ToList();
+            limitationGroups.Add(new LimitationGroup("tochni"));
+            limitationGroups.Add(new LimitationGroup("razkazvatelni"));
+            limitationGroups.Add(new LimitationGroup("ezici"));
+
+            teachers = teacherNames.Select(t => new Teacher(t, new List<Subject>() { })).ToList();
             subjects = subjectNames.Select(s => new Subject(s, new List<LimitationGroup>() { limitationGroups.First(lg => lg.name==s)})).ToList();
-            groups = getGroups(filename, excellSuperGroups, subjects, teachers, limitationGroups);
+            loadDayLims();
+            
+            groups = getGroups(filename, excellSuperGroups, subjects, teachers, limitationGroups, subjectNames);
 
             superGroups = new List<SuperGroup>();
             for(int i = 0;i<excellSuperGroups.Count;i++)
@@ -277,10 +363,10 @@ namespace SchoolManager
                                                excellSuperGroups[i].teachers.Select(t => teachers.First(x => x.name==t)).ToList(), excellSuperGroups[i].positions.Count/excellSuperGroups[i].groups.Count, new List<int>() { });
 
                 superGroups.Add(sg);
-                Console.WriteLine($"{string.Join(", ", excellSuperGroups[i].groups)} -> {sg.weekLessons}");
+                //Console.WriteLine($"{string.Join(", ", excellSuperGroups[i].groups)} -> {sg.weekLessons}");
             }
 
-            subjects.ForEach(s => higharchy.addChild(new SubjectTreeNode(s)));
+            loadHigharcy();
         }
 
         public static void test(string filename)
