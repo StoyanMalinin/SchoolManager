@@ -495,6 +495,8 @@ namespace SchoolManager.Generation_utils
             for (int i = 0; i < 10; i++) 
                 teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[i]}));
             //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
+
+            sw = new System.Diagnostics.Stopwatch();
         }
 
         private static Dictionary<string, DaySchedule> calculated = new Dictionary<string, DaySchedule>();
@@ -505,14 +507,12 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine("KKKKKKKKKKKKKKKKKKKKKKK");
             //Console.WriteLine(state.Count);
             init(onlyConsequtive);
-
-            Console.WriteLine(calculated.Count);
+            
+            //Console.WriteLine(calculated.Count);
             string str = string.Join("|", Enumerable.Range(0, state.Count).Select(gInd => string.Join(" ", teacherList[gInd].Select(x => x.Item2.name))));
             if (calculated.ContainsKey(str) == true) return calculated[str];
 
-            sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            
             rec(0, onlyConsequtive);
             //if (output != null) Console.WriteLine("opa naredihme gi");
             //else Console.WriteLine("opa ne gi naredihme");

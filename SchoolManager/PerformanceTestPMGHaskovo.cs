@@ -226,7 +226,7 @@ namespace SchoolManager
 
                     var weekLims = limitationGroups.Select(lg => Tuple.Create(lg, allSubjects.Count(x => x==lg.name))).ToList();
 
-                    var dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).ToList();
+                    var dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).Reverse().ToList();
 
                     Console.WriteLine($"{gName} -> {string.Join(", ", subject2TeacherName)}");
                    // Console.WriteLine(string.Join("\n", weekLims.Select(t => $"{t.Item1.name} -> {t.Item2}")));
@@ -251,7 +251,8 @@ namespace SchoolManager
         {
             List<SuperGroupExcell> excellSuperGroups = getSuperGroups(filename).ToList();   
             Console.WriteLine($"superGroupsCnt = {excellSuperGroups.Count}");
-            Console.WriteLine(string.Join("\n", excellSuperGroups));
+            //Console.WriteLine(string.Join("\n", excellSuperGroups));
+            for(int i = 0;i<excellSuperGroups.Count;i++) System.Console.WriteLine($"{i} -> {excellSuperGroups[i].ToString()}");
             Console.WriteLine();
 
             List<string> subjectNames = getSubjects(filename);

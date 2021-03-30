@@ -429,7 +429,7 @@ namespace SchoolManager.Generation_utils
             }
 
             return true;
-        }
+        }   
 
         static int callNum = 0, succsefullCallNum = 0;
 
@@ -486,7 +486,6 @@ namespace SchoolManager.Generation_utils
 
                 if (dayRes == null) return null;
                 ws.days[day] = dayRes;
-                //Console.WriteLine($"---{day}");
             }
 
             bool diagnosticsRes = runDiagnostics();

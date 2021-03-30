@@ -2,14 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using OfficeOpenXml;
+using System.Reflection;
+using System.IO;
 
 namespace SchoolManager.ScheduleUtils
 {
     class DaySchedule
     {
-        private int maxLessons;
-        private List<Teacher> teachers;
+        public int maxLessons;
+        public List<Teacher> teachers;
         public Subject[,] lessonTeacher2Subject;
         public Subject[,] lessonGroup2Subject;
 
