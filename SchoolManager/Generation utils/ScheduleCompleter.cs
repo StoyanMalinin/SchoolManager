@@ -146,28 +146,37 @@ namespace SchoolManager.Generation_utils
         List <int>[] relevantGroups;
         private List<TeacherSelection> teacherSelections;
 
-        private long getState(TeacherSelection ts)
+        private long getState(TeacherSelection ts, int g)
         {
             long state = 0;
             
             const long key = 1019;
-            const long mod = 423488915388101;
+            const long mod = 67772998972500529;
             const long emptySymbol = key - 1;
             const long separatingSymbol = key - 2;
 
+            state = (state*key + g + 1)%mod;
             for(int i = 0;i<ts.isSelected.Length;i++)
                 state = (state*key + Convert.ToInt64(ts.isSelected[i]) + 1);
             state = (state*key + separatingSymbol)%mod;
 
             for(int lesson = 0;lesson<maxLessons;lesson++)
             {
-                for(int t = 0;t<teachers.Count;t++)
+                for(int t = 0;t<teachers.Count+supergroupMultilessons.Count+1;t++)
                 {
-                    if(ts.isSelected[t]==false) state = (state*key + emptySymbol)%mod;
-                    else state = (state*key + lessonTeacher[lesson, t] + 1)%mod;
+                    if(t<teachers.Count)
+                    {
+                        if(ts.isSelected[t]==false) state = (state*key + emptySymbol)%mod;
+                        else state = (state*key + lessonTeacher[lesson, t] + 1)%mod;
+                    }
+                    else
+                    {
+                        state = (state*key + lessonTeacher[lesson, t] + 1)%mod;
+                    }
                 }
             }
 
+            /*
             state = (state*key + separatingSymbol)%mod;
             for(int i = 0;i<isTeacherLocked.Length;i++)
                 state = (state*key + Convert.ToInt64(isTeacherLocked[i]) + 1)%mod;
@@ -192,6 +201,7 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
+            */
 
             return state;
         }
@@ -305,17 +315,20 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            if (sw.ElapsedMilliseconds > 1 * 1000) return;
+            if (sw.ElapsedMilliseconds > 2 * 1000) return;
 
             long[] skeletonStates = new long[teacherSelections.Count];
-            for(int i = 0;i<skeletonStates.Length;i++) skeletonStates[i] = getState(teacherSelections[i]);
+            for(int i = 0;i<skeletonStates.Length;i++) skeletonStates[i] = getState(teacherSelections[i], g);
 
             bool failsFound = false;
             for(int i = 0;i<teacherSelections.Count;i++)
             {
                 if(teacherSelections[i].failedStates.Contains(skeletonStates[i])==true)
                 {
+                    //System.Console.WriteLine("gutt");
+
                     failsFound = true;
+                    continue;
                 }
                 
                 bool fail = false;
@@ -374,8 +387,8 @@ namespace SchoolManager.Generation_utils
 
                 for(int i = 0;i<teacherSelections.Count;i++)
                 {
-                    if(isFailed[i]==false) continue;
-                    if(teacherSelections[i].failedStates.Contains(getState(teacherSelections[i]))==false) isFailed[i] = false;
+                    //if(isFailed[i]==false) continue;
+                    //if(teacherSelections[i].failedStates.Contains(getState(teacherSelections[i], g+1))==false) isFailed[i] = false;
                 }
 
                 solution[g] = null;
@@ -475,16 +488,20 @@ namespace SchoolManager.Generation_utils
                 {
                     int cnt = teacherList[g].Count(x => ((x.Item1<teachers.Count && x.Item1==t) || 
                     (x.Item1>=teachers.Count && supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count).First(i => superTeacherInd[i] == x.Item1)].Item1.teachers
-                    .Any(y => y.Equals(teachers[t])==true))));
+                    .Any(y => y.Equals(teachers[t])==true)==true)));
 
                     if(cnt>0) relevantGroups[t].Add(g);
                 }
+
+                //System.Console.WriteLine($"{t} -> {string.Join(", ", relevantGroups[t])}");
             }
 
             for (int g = 0; g < state.Count; g++)
             {
                 teacherPermList[g] = genPerms(teacherList[g]);
                 teacherPermList[g] = teacherPermList[g].Where(t => t.isGood == true || onlyConsequtive == false);
+
+                //System.Console.WriteLine($"{g} ==> {string.Join(" ", teacherList[g].Select(t => t.Item1))}");
             }
 
             teacherSelections = new List<TeacherSelection>();
@@ -492,8 +509,12 @@ namespace SchoolManager.Generation_utils
             .Sum(tl => tl.Count(x => ((x.Item1<teachers.Count && x.Item1==ind) || 
             (x.Item1>=teachers.Count))))).ToList(); 
 
-            for (int i = 0; i < 10; i++) 
+            for (int i = 0; i < 0; i++) 
+            {
+                //System.Console.WriteLine($"teacher selected: {sortedTeachers[i]}");
                 teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[i]}));
+            }
+                
             //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
 
             sw = new System.Diagnostics.Stopwatch();
@@ -508,7 +529,7 @@ namespace SchoolManager.Generation_utils
             //Console.WriteLine(state.Count);
             init(onlyConsequtive);
             
-            //Console.WriteLine(calculated.Count);
+            Console.WriteLine(calculated.Count);
             string str = string.Join("|", Enumerable.Range(0, state.Count).Select(gInd => string.Join(" ", teacherList[gInd].Select(x => x.Item2.name))));
             if (calculated.ContainsKey(str) == true) return calculated[str];
 
@@ -517,7 +538,7 @@ namespace SchoolManager.Generation_utils
             //if (output != null) Console.WriteLine("opa naredihme gi");
             //else Console.WriteLine("opa ne gi naredihme");
 
-            //Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
+            Console.WriteLine($"Generation time = {sw.ElapsedMilliseconds}");
             sw.Stop();
 
             calculated[str] = output;

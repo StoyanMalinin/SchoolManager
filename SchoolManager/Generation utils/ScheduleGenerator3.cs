@@ -392,7 +392,7 @@ namespace SchoolManager.Generation_utils
 
                         if (dayState[day].updateLimits(g, s, groupSubject2Teacher[g, s], +1) == false)
                         {
-                            //Console.WriteLine($"ebalo si maikata {g}");
+                            Console.WriteLine($"ebalo si maikata {g}");
                             return null;
                         }
                     }
@@ -401,13 +401,13 @@ namespace SchoolManager.Generation_utils
                 if (dayState[day].groups[g].curriculum.Count < dayState[day].groups[g].minLessons
                     || dayState[day].groups[g].curriculum.Count > maxLessons)
                 {
-                    //Console.WriteLine($"e de {dayState[day].groups[g].curriculum.Count} {g} || {day}");
+                    Console.WriteLine($"e de {dayState[day].groups[g].curriculum.Count} {g} || {day}");
                     return null;
                 }
                        
             }
 
-            //Console.WriteLine("pak faida e ");
+            Console.WriteLine("pak faida e ");
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
 
             DaySchedule ds = sc.gen(true);
@@ -513,7 +513,7 @@ namespace SchoolManager.Generation_utils
             }
 
             bool diagnosticsRes = runDiagnostics();
-            if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;//throw new Exception();
+            //if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;//throw new Exception();
             
             //Console.WriteLine("davai volene");
             succsefullCallNum++;

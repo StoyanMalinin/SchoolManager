@@ -275,7 +275,7 @@ namespace SchoolManager
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("математика"), 2));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
-            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("?? - ри чужд език"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
 
             foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsGeneral.Any(t => t.Item1.name==x.name)==false))
                 dayLimsGeneral.Add(Tuple.Create(new LimitationGroup(s.name), 2));
@@ -355,12 +355,34 @@ namespace SchoolManager
             loadDayLims();
             
             groups = getGroups(filename, excellSuperGroups, subjects, teachers, limitationGroups, subjectNames);
+            foreach(Group g in groups)
+            {
+                g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="БЕЛ").Item2, 
+                                                                               g.subject2Teacher.First(t => t.Item1.name=="БЕЛ").Item1, 
+                                                                               new Generation_utils.IntInInterval(2, 2)));
+
+                if(g.name.Last()!='д')
+                {
+                     g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="математика").Item2, 
+                                                                               g.subject2Teacher.First(t => t.Item1.name=="математика").Item1, 
+                                                                               new Generation_utils.IntInInterval(2, 2)));
+                }
+            }
 
             superGroups = new List<SuperGroup>();
             for(int i = 0;i<excellSuperGroups.Count;i++)
             {
+                List <int> multilessons = new List<int>();
+
+                System.Console.WriteLine($"---------- {excellSuperGroups[i].groups[0].Item2}");
+                if(excellSuperGroups[i].groups[0].Item2=="2 - ри чужд език") 
+                {
+                    System.Console.WriteLine("ima go");
+                    //multilessons.Add(2);
+                }
+
                 SuperGroup sg = new SuperGroup(i.ToString(), excellSuperGroups[i].groups.Select(t => Tuple.Create(groups.First(g => g.name == t.Item1), subjects.First(s => s.name == t.Item2))).ToList(),
-                                               excellSuperGroups[i].teachers.Select(t => teachers.First(x => x.name==t)).ToList(), excellSuperGroups[i].positions.Count/excellSuperGroups[i].groups.Count, new List<int>() { });
+                                               excellSuperGroups[i].teachers.Select(t => teachers.First(x => x.name==t)).ToList(), excellSuperGroups[i].positions.Count/excellSuperGroups[i].groups.Count, multilessons);
 
                 superGroups.Add(sg);
                 //Console.WriteLine($"{string.Join(", ", excellSuperGroups[i].groups)} -> {sg.weekLessons}");
