@@ -163,17 +163,8 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
-
-            if(memo is null)
-            {
-                memo = new Dictionary<string, DaySchedule>[workDays+1];
-                for(int day = 1;day<=workDays;day++) 
-                    memo[day] = new Dictionary<string, DaySchedule>();
-            }
-            
         }
 
-        private static Dictionary <string, DaySchedule>[] memo = null;
         private string getState(int day)
         {
             string state = "";
@@ -515,7 +506,7 @@ namespace SchoolManager.Generation_utils
             bool diagnosticsRes = runDiagnostics();
             //if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;//throw new Exception();
             
-            //Console.WriteLine("davai volene");
+            Console.WriteLine("davai volene");
             succsefullCallNum++;
 
             return ws;

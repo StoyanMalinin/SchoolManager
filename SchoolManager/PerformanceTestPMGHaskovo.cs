@@ -378,7 +378,7 @@ namespace SchoolManager
                 if(excellSuperGroups[i].groups[0].Item2=="2 - ри чужд език") 
                 {
                     System.Console.WriteLine("ima go");
-                    //multilessons.Add(2);
+                    multilessons.Add(2);
                 }
 
                 SuperGroup sg = new SuperGroup(i.ToString(), excellSuperGroups[i].groups.Select(t => Tuple.Create(groups.First(g => g.name == t.Item1), subjects.First(s => s.name == t.Item2))).ToList(),

@@ -52,7 +52,7 @@ namespace SchoolManager.Generation_utils
         private List <int>[] supergroup2TeacherInds;
         private List <Tuple<int, int>>[] supergroup2GroupSubjetInds;
 
-        bool[,] freeSupergroupMultilessonsAdded;
+        bool [][] supergroupMultilessonsAdded;
         List<Tuple<SuperGroup, int>>[] supergroupMultilessons = new List<Tuple<SuperGroup, int>>[workDays + 1];
 
         private bool arrangeMultilessons(int day, int ind)
@@ -83,46 +83,58 @@ namespace SchoolManager.Generation_utils
 
             bool res = false;
 
-            if (res == false)
+            
+            if (usedMultilessons[ind] == false)
             {
-                if (usedMultilessons[ind] == false)
+                usedMultilessons[ind] = true;
+                multilessons[day].Add(allMultilessons[ind]);
+
+                bool successful = applyMultilesson(day, ind, allMultilessons[ind].val.l, +1);
+
+                if(successful==true)
                 {
-                    usedMultilessons[ind] = true;
-                    multilessons[day].Add(allMultilessons[ind]);
-
-                    bool successful = applyMultilesson(day, ind, allMultilessons[ind].val.l, +1);
-
-                    if(successful==true)
+                    ScheduleGenerator3 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
+                    if (sg.gen(workDays, true) != null)
                     {
-                        ScheduleGenerator3 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
-                        if (sg.gen(workDays, true) != null)
-                        {
-                            res |= arrangeMultilessons(day, ind + 1);
-                        }
+                        res |= arrangeMultilessons(day, ind + 1);
                     }
-                    
-
-                    applyMultilesson(day, ind, allMultilessons[ind].val.l, -1);
-
-                    multilessons[day].RemoveAt(multilessons[day].Count - 1);
-                    usedMultilessons[ind] = false;
                 }
-            }
+                
 
-            if (res==false)
+                applyMultilesson(day, ind, allMultilessons[ind].val.l, -1);
+
+                multilessons[day].RemoveAt(multilessons[day].Count - 1);
+                usedMultilessons[ind] = false;
+
+                if(res==true) return true;
+            }
+            
+            if((usedMultilessons[ind]==true || day!=workDays) && arrangeMultilessons(day, ind+1)==true)
             {
-                if(arrangeMultilessons(day, ind+1)==true)
-                {
-                    res = true;
-                }
+                res = true;
+                return true;                
             }
 
-            return res;
+            System.Console.WriteLine($"em pone {usedMultilessons.Count(x => x==true)}");
+            return false;
         }
 
         bool applySupergroupMultilesson(int day, int sgInd, int lessonsCnt, int sign)
         {
             bool successful = true;
+            
+            if(sign==+1)
+            {
+                superGroups[sgInd].weekLessons -= lessonsCnt;
+                supergroupMultilessons[day].Add(Tuple.Create(superGroups[sgInd], lessonsCnt));
+            }
+            else
+            {
+                superGroups[sgInd].weekLessons += lessonsCnt;
+                supergroupMultilessons[day].RemoveAt(supergroupMultilessons[day].Count - 1);
+            }
+            successful &= (superGroups[sgInd].weekLessons>=0);
+
             for(int iter = 0;iter<lessonsCnt;iter++)
             {
                 foreach(var item in supergroup2GroupSubjetInds[sgInd])
@@ -176,73 +188,42 @@ namespace SchoolManager.Generation_utils
             }
 
             bool res = false;
-            mInd = Enumerable.Range(1, workDays).Sum(d => supergroupMultilessons[d].Count(x => x.Item1.Equals(superGroups[sgInd])));
+
+            //using required multilessons
+            for(int i = 0;i<superGroups[sgInd].requiredMultilessons.Count;i++)
+            {
+                if(supergroupMultilessonsAdded[sgInd][i]==true) continue;
+
+                supergroupMultilessonsAdded[sgInd][i] = true;
+                bool succ = applySupergroupMultilesson(day, sgInd, superGroups[sgInd].requiredMultilessons[i], +1);
+                
+                if(succ==true && arrangeSuperGroups(sgInd+1, day)==true) res = true;
+                
+                supergroupMultilessonsAdded[sgInd][i] = false;
+                applySupergroupMultilesson(day, sgInd, superGroups[sgInd].requiredMultilessons[i], -1);
             
-            System.Console.WriteLine($"{mInd} == {superGroups[sgInd].requiredMultilessons.Count}");
-            //if(mInd>0) throw new Exception();
-
-            if (mInd >= superGroups[sgInd].requiredMultilessons.Count)
-            {
-                if (freeSupergroupMultilessonsAdded[sgInd, day] == false)
-                {
-                    freeSupergroupMultilessonsAdded[sgInd, day] = true;
-
-                    List<int> possible = new List<int>();
-                    for (int lessons = ((day != workDays) ? 0 : superGroups[sgInd].weekLessons); lessons <= superGroups[sgInd].weekLessons; lessons++)
-                        possible.Add(lessons);
-                    possible.Reverse();
-                    //Shuffle(possible);
-
-                    foreach (int lessons in possible)
-                    {
-                        superGroups[sgInd].weekLessons -= lessons;
-                        supergroupMultilessons[day].Add(Tuple.Create(superGroups[sgInd], lessons));
-                        bool succ = applySupergroupMultilesson(day, sgInd, lessons, +1);
-
-                        //Console.WriteLine($"{string.Join(", ", superGroups[sgInd].groups.Select(g => $"({g.Item1.name}, {g.Item2.name})"))} {lessons}");
-                        if (succ==true && arrangeSuperGroups(sgInd + 1, day) == true)
-                        {
-                            res = true;
-                        }
-
-                        superGroups[sgInd].weekLessons += lessons;
-                        applySupergroupMultilesson(day, sgInd, lessons, -1);
-                        supergroupMultilessons[day].RemoveAt(supergroupMultilessons[day].Count - 1);
-
-                        if (res == true) break;
-                    }
-
-                    freeSupergroupMultilessonsAdded[sgInd, day] = false;
-                }
-            }
-            else if(res==false)
-            {
-                int lessons = superGroups[sgInd].requiredMultilessons[mInd];
-                if (superGroups[sgInd].weekLessons >= lessons)
-                {
-                    superGroups[sgInd].weekLessons -= lessons;
-                    bool succ = applySupergroupMultilesson(day, sgInd, lessons, +1);
-                    supergroupMultilessons[day].Add(Tuple.Create(superGroups[sgInd], lessons));
-
-                    if (succ==true && arrangeSuperGroups(sgInd+1, day) == true)
-                    {
-                        res = true;
-                    }
-
-                    superGroups[sgInd].weekLessons += lessons;
-                    applySupergroupMultilesson(day, sgInd, lessons, -1);
-                    supergroupMultilessons[day].RemoveAt(supergroupMultilessons[day].Count - 1);
-                }
+                if(res==true) return true;
             }
 
-            return res;
+            int requiredLeft = Enumerable.Range(0, superGroups[sgInd].requiredMultilessons.Count)
+            .Sum(ind => ((supergroupMultilessonsAdded[sgInd][ind]==false)?superGroups[sgInd].requiredMultilessons[ind]:0)); 
+
+            //using free multilessons
+            for(int lessons = superGroups[sgInd].weekLessons - requiredLeft;lessons>=((day != workDays) ? 0 : superGroups[sgInd].weekLessons);lessons--)
+            {
+                bool succ = applySupergroupMultilesson(day, sgInd, lessons, +1);
+                if(succ==true && arrangeSuperGroups(sgInd+1, day)==true) res = true;
+                applySupergroupMultilesson(day, sgInd, lessons, -1);
+            
+                if(res==true) return true;
+            }
+
+            return false;
         }
 
         private bool arrangeSuperGroups(int sgInd, int day)
         {
-            //ScheduleGenerator3 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
-            //if (sg.gen() == null) return false;
-
+            ScheduleGenerator3 sg = null;
             if (sgInd==superGroups.Count)
             {
                 for (int t = 0; t < teachers.Count; t++)
@@ -255,21 +236,18 @@ namespace SchoolManager.Generation_utils
                 }
 
                 
-                ScheduleGenerator3 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
+                sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
                 if (sg.gen(day, (day==workDays)) == null) return false;
 
                 Console.WriteLine($"--------------> {day} {sgInd}");
 
                 if (day == workDays) return arrangeMultilessons(1, 0);
-                else return arrangeSuperGroups(0, day + 1);
+                return arrangeSuperGroups(0, day + 1);
             }
 
             for (int t = 0; t < teachers.Count; t++)
             {
-                //int demand = superGroups.Where(sg => sg.teachers.Any(x => x.Equals(teachers[t]) == true) == true).Sum(sg => sg.weekLessons);
                 int demand = teacherDemand[t];
-
-                //int today = supergroupMultilessons[day].Where(x => x.Item1.teachers.Any(y => y.Equals(teachers[t]) == true) == true).Sum(x => x.Item2);
                 int today = 6 - dayState[day].teacherLeftLessons[t];
 
                 if (today > 6) return false;
@@ -278,8 +256,8 @@ namespace SchoolManager.Generation_utils
 
             if(day!=workDays)
             {
-                ScheduleGenerator3 sg1 = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
-                if (sg1.gen(day, false) == null) return false;
+                sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
+                if (sg.gen(day, false) == null) return false;
             }
             
 
@@ -294,7 +272,6 @@ namespace SchoolManager.Generation_utils
                 foreach (Multilesson m in g.requiredMultilessons)
                     allMultilessons.Add(m);
             }
-            //allMultilessons.Clear();
 
             usedMultilessons = new bool[allMultilessons.Count];
             for (int i = 0; i < usedMultilessons.Length; i++) usedMultilessons[i] = false;
@@ -307,10 +284,8 @@ namespace SchoolManager.Generation_utils
                 dayState[day] = new ScheduleDayState(refList.Select(g => g.ClonePartial(g.weekLims)).ToList(), teachers, maxLessons);
             }
 
-            freeSupergroupMultilessonsAdded = new bool[superGroups.Count, workDays + 1];
             for (int day = 1; day <= workDays; day++)
             {
-                for(int i = 0;i<superGroups.Count;i++) freeSupergroupMultilessonsAdded[i, day] = false;
                 supergroupMultilessons[day] = new List<Tuple<SuperGroup, int>>(100);
             }
 
@@ -332,6 +307,13 @@ namespace SchoolManager.Generation_utils
                 foreach(var g in superGroups[i].groups)
                     supergroup2GroupSubjetInds[i].Add(Tuple.Create(groups.FindIndex(x => x.Equals(g.Item1)==true),
                                                                    g.Item1.findSubject(g.Item2)));
+            }
+
+            supergroupMultilessonsAdded = new bool[superGroups.Count][];
+            for(int i = 0;i<supergroupMultilessonsAdded.Length;i++) 
+            {
+                supergroupMultilessonsAdded[i] = new bool[superGroups[i].requiredMultilessons.Count];
+                for(int j = 0;j<supergroupMultilessonsAdded[i].Length;j++) supergroupMultilessonsAdded[i][j] = false;
             }
         }
 
