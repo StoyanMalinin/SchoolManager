@@ -294,6 +294,8 @@ namespace SchoolManager
             Dictionary <string, string> subject2LimGroup = new Dictionary<string, string>();
             subject2LimGroup.Add("математика", "tochni");
             subject2LimGroup.Add("география", "razkazvatelni");
+            subject2LimGroup.Add("история", "razkazvatelni");
+            subject2LimGroup.Add("физика", "razkazvatelni");
             subject2LimGroup.Add("английски език", "ezici");
             subject2LimGroup.Add("БЕЛ", "razkazvatelni");
 
@@ -365,6 +367,13 @@ namespace SchoolManager
                 {
                      g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="математика").Item2, 
                                                                                g.subject2Teacher.First(t => t.Item1.name=="математика").Item1, 
+                                                                               new Generation_utils.IntInInterval(2, 2)));
+                }
+
+                if(g.name.Length<=3 && g.name[0]!='8')
+                {
+                    g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="английски език").Item2, 
+                                                                               g.subject2Teacher.First(t => t.Item1.name=="английски език").Item1, 
                                                                                new Generation_utils.IntInInterval(2, 2)));
                 }
             }

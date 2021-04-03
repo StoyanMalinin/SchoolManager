@@ -11,7 +11,7 @@ namespace SchoolManager.Generation_utils
     class ScheduleGenerator3
     {
         const int workDays = 5;
-        const int maxLessons = 7;
+        const int minLessons = 6, maxLessons = 7;
 
         private List<Group> groups;
         private List<Teacher> teachers;
@@ -70,8 +70,10 @@ namespace SchoolManager.Generation_utils
 
         private List<int>[,] teacherGroup2Subjects;
         private int[,] groupSubject2Teacher;
-
         private int[,] groupSubjectEdge;
+
+        private static List <Tuple <int, int>>[][] lastConfig = null;
+        private static DaySchedule[] lastConfigSolution = null; 
 
         private void initNodes()
         {
@@ -102,7 +104,6 @@ namespace SchoolManager.Generation_utils
                     {
                         int sInd = groups[g].findSubject((x as SubjectTreeNode).s);
                         if(sInd!=-1) groupSubjectNode[g, sInd] = x.nodeCode;
-                        //Console.WriteLine($"{g} -> [{groups[g].findSubject((x as SubjectTreeNode).s)} <=> {x.nodeCode}]");
 
                         return;
                     }
@@ -163,31 +164,68 @@ namespace SchoolManager.Generation_utils
                     }
                 }
             }
+
+            if(lastConfig is null)
+            {
+                lastConfigSolution = new DaySchedule[workDays+1];
+                lastConfig = new List<Tuple<int, int>>[workDays+1][];
+                for(int day = 1;day<=workDays;day++) lastConfig[day] = null;
+            }
         }
 
-        private string getState(int day)
+        private bool tryConfig(List <Tuple <int, int>>[] config, int day)
         {
-            string state = "";
-            foreach(Group g in dayState[1].groups) state += string.Join("$", g.weekLims.Select(x => x.cnt)) + "|";
-            state += "||";
-
-            for(int d = day;d<=workDays;d++)
+            bool succ = true;
+            for(int g = 0;g<config.Length;g++)
             {
-                state += string.Join("", multilessons[d].Select(m => $"({m.g.name}, {m.s.name}, {m.val})")) + "|";
-                state += string.Join("", supergroupMultilessons[d].Select(sg => $"({sg.Item1.name}, {sg.Item2})"));
-                state += "!";
+                foreach(var tup in config[g]) succ &= dayState[day].updateLimits(g, tup.Item1, tup.Item2, +1);
+
+                if (dayState[day].groups[g].curriculum.Count < dayState[day].groups[g].minLessons
+                    || dayState[day].groups[g].curriculum.Count > maxLessons)
+                {
+                    succ = false;
+                }
             }
 
-            return state;
+            for(int g = 0;g<groups.Count;g++)
+            {
+                foreach(Multilesson m in multilessons[day].Where(x => (x.g.Equals(groups[g])==true)))
+                {
+                    int cnt = dayState[day].groups[g].curriculum.Count(s => s.Equals(m.s)==true);
+                    if (cnt < m.val.l || cnt > m.val.r) succ = false;
+                }
+            }
+
+            succ &= checkPossible(day+1);
+
+            for(int g = 0;g<config.Length;g++)
+            {
+                foreach(var tup in config[g]) dayState[day].updateLimits(g, tup.Item1, tup.Item2, -1);
+            }
+            return succ;
         }
 
+        private DaySchedule useConfig(List <Tuple <int, int>>[] config, int day)
+        {
+            for(int g = 0;g<config.Length;g++)
+            {
+                foreach(var tup in config[g]) dayState[day].updateLimits(g, tup.Item1, tup.Item2, +1);
+            }
+
+            return lastConfigSolution[day];
+        }
 
         private DaySchedule generateDay(int day)
         {
+            if((!(lastConfig[day] is null)) && tryConfig(lastConfig[day], day)==true)
+            {
+                return useConfig(lastConfig[day], day);
+            }
+
             G.reset();
 
             // ----- setting node demands -----
-            G.setDemand(allTeachersNode, -(Enumerable.Range(0, groups.Count).Sum(ind => dayState[day].groupLeftLessons[ind])));//redo later, when we can have daily lessons, different than maxLessons
+            G.setDemand(allTeachersNode, -(Enumerable.Range(0, groups.Count).Sum(ind => dayState[day].groupLeftLessons[ind])));
             for (int g = 0; g < groups.Count; g++) G.setDemand(groupNode[g], dayState[day].groupLeftLessons[g]);
         
             // ----- adding edges ----- 
@@ -195,8 +233,6 @@ namespace SchoolManager.Generation_utils
             //connecting teachers to allTeachersNode
             for(int t = 0;t<teachers.Count;t++)
             {
-                //Console.WriteLine($"Teacher: {teachers[t].name}");
-
                 int requested = 0;
                 for (int g = 0; g < groups.Count; g++)
                 {
@@ -218,7 +254,7 @@ namespace SchoolManager.Generation_utils
                 int c = dayState[day].teacherLeftLessons[t];
 
                 //Console.WriteLine($"{teachers[t].name} -> {l} {c}");
-                G.addEdge(u, v, l, Math.Min(c, 6), true);
+                G.addEdge(u, v, l, Math.Min(c, minLessons), true);
             }
 
             //connecting teachers to possible lessons
@@ -235,12 +271,8 @@ namespace SchoolManager.Generation_utils
                         foreach (Multilesson r in important)
                             scheduledLessons = scheduledLessons + r.val;
 
-                        //if (teachers[t].name== "gabarcheto") Console.WriteLine($"%%% {teachers[t].name} -> {dayState[day].groups[g].subject2Teacher[s].Item1.name} " +
-                        //                                                       $"|| [{scheduledLessons.l}, {scheduledLessons.r}] || {important.Count}");
-
-                        //if (scheduledLessons.l != scheduledLessons.r) throw new Exception();
                         if(important.Count>0) G.addEdge(teacherNode[t], groupSubjectNode[g, s], scheduledLessons.l, scheduledLessons.r, true);
-                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, 6, true);
+                        else G.addEdge(teacherNode[t], groupSubjectNode[g, s], 0, minLessons, true);
                     }
                 }
             }
@@ -348,29 +380,27 @@ namespace SchoolManager.Generation_utils
                 int upperBound = dayState[day].groups[g].subject2Teacher.Sum(t => dayState[day].groups[g].getSubjectWeekLim(dayState[day].groups[g].findSubject(t.Item1)));
                 for (int d = day + 1; d <= workDays; d++) upperBound -= Math.Min(dayState[d].groupLeftLessons[g], groups[g].minLessons);
 
-                //if(Math.Max(Math.Max(groups[g].minLessons, allLeft), fixatedLessons) > dayState[day].groupLeftLessons[g])
-                //    Console.WriteLine("KKkk");
                 G.addEdge(groupHigharchy[g].nodeCode, groupNode[g], 
                           Math.Max(Math.Max(groups[g].minLessons - dayState[day].groups[g].curriculum.Count, allLeft), fixatedLessons), 
                           Math.Min(dayState[day].groupLeftLessons[g], upperBound));
-
-                //if (g == 0) Console.WriteLine($"upperBound = {upperBound}");
             }
 
             //connecting groups to allTeachersNode
             for (int g = 0; g < groups.Count; g++)
             {
-                G.addEdge(allTeachersNode, groupNode[g], 0, 1);//Math.Max(dayState[day].groupLeftLessons[g] - dayState[day].groups[g].minLessons, 0));
+                G.addEdge(allTeachersNode, groupNode[g], 0, Math.Min(maxLessons-minLessons, maxLessons-dayState[day].groups[g].curriculum.Count));
             }
 
             G.eval();
 
+            List <Tuple<int, int>>[] currConfig = new List<Tuple <int, int>>[groups.Count];
             for(int g = 0;g<groups.Count;g++)
             {
                 //Console.WriteLine($"---- {groups[g].name} - {g} ---");
 
                 int expectedCnt = dayState[day].groupLeftLessons[g];
                 List<int> teacherInds = new List<int>();
+                currConfig[g] = new List<Tuple <int, int>>();
 
                 for (int s = 0; s < groups[g].subject2Teacher.Count; s++)
                 {
@@ -378,6 +408,7 @@ namespace SchoolManager.Generation_utils
                         
                     for (int i = 0; i < G.getEdge(groupSubjectEdge[g, s]); i++)
                     {
+                        currConfig[g].Add(Tuple.Create(s, groupSubject2Teacher[g, s]));
                         teacherInds.Add(groupSubject2Teacher[g, s]);
                         //Console.WriteLine(teachers[groupSubject2Teacher[g, s]].name);
 
@@ -400,8 +431,13 @@ namespace SchoolManager.Generation_utils
 
             Console.WriteLine("pak faida e ");
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
-
             DaySchedule ds = sc.gen(true);
+
+            if(!(ds is null)) 
+            {
+                lastConfigSolution[day] = ds;
+                lastConfig[day] = currConfig;
+            }
             return ds;
         }
 
@@ -446,6 +482,36 @@ namespace SchoolManager.Generation_utils
             return true;
         }   
 
+        private bool checkPossible(int day)
+        {
+            for(int t = 0;t<teachers.Count;t++)
+            {
+                int demand = 0;
+                for(int g = 0;g<dayState[1].groups.Count;g++)
+                {
+                    demand += dayState[1].groups[g].subject2Teacher.Where(tup => (!(tup.Item2 is null)) && tup.Item2.Equals(teachers[t])==true)
+                    .Sum(x => dayState[1].groups[g].getSubjectWeekLim(dayState[1].groups[g].findSubject(x.Item1)));
+                }
+
+                for(int d = day;d<=workDays;d++) demand -= dayState[d].teacherLeftLessons[t];
+
+                if(demand>0) return false;
+            }
+
+            for(int g = 0;g<dayState[1].groups.Count;g++)
+            {
+                for(int s = 0;s<dayState[1].groups[g].subject2Teacher.Count;s++)
+                {
+                    int demand = dayState[1].groups[g].getSubjectWeekLim(s);
+                    for(int d = day;d<=workDays;d++) demand -= dayState[d].groups[g].getDayBottleneck(s);
+
+                    if(demand>0) return false;
+                }
+            }
+            
+            return true;
+        }
+
         static int callNum = 0, succsefullCallNum = 0;
 
         public WeekSchedule gen(int limDay, bool isFinal)
@@ -461,21 +527,17 @@ namespace SchoolManager.Generation_utils
             
             for (int day = 1; day <= limDay; day++)
             {
-                //Console.WriteLine($"supergroupMultilessons[{day}].Count = {supergroupMultilessons[day].Count}");
                 foreach (var item in supergroupMultilessons[day])
                 {
                     for(int iter = 0;iter<item.Item2;iter++)
                     {
                         foreach (Tuple<Group, Subject> tup in item.Item1.groups)
-                        {
-                            //Console.WriteLine($"------------{day} {item.Item1.name} {item.Item2}");
-                            
+                        {                            
                             int g = groups.FindIndex(g => g.Equals(tup.Item1));
                             int s = groups[g].findSubject(tup.Item2);
 
                             if (dayState[day].updateLimitsNoTeacher(g, s, +1) == false)
                             {
-                                //Console.WriteLine($"bez tichar {g} {dayState[day].groupLeftLessons[g]} {string.Join(",", dayState[day].groups[g].curriculum.Select(s => s.name))}");
                                 return null;
                             }
                                    
@@ -497,6 +559,11 @@ namespace SchoolManager.Generation_utils
 
             for (int day = 1;day<=limDay;day++)
             {
+                if(checkPossible(day)==false) 
+                {
+                    System.Console.WriteLine("FAKKKKKKKKKKKK");
+                    return null;
+                }
                 DaySchedule dayRes = generateDay(day);
 
                 if (dayRes == null) return null;
@@ -504,7 +571,7 @@ namespace SchoolManager.Generation_utils
             }
 
             bool diagnosticsRes = runDiagnostics();
-            //if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;//throw new Exception();
+            if (diagnosticsRes == false && limDay==workDays && isFinal==true) return null;
             
             Console.WriteLine("davai volene");
             succsefullCallNum++;

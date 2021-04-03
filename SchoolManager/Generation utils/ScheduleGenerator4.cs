@@ -11,7 +11,7 @@ namespace SchoolManager.Generation_utils
     class ScheduleGenerator4
     {
         const int workDays = 5;
-        const int maxLessons = 5;
+        const int minLessons = 6, maxLessons = 7;
 
         private TreeNode higharchy;
         private List<Group> groups;
@@ -81,9 +81,21 @@ namespace SchoolManager.Generation_utils
                 return true;
             }
 
-            bool res = false;
+            for(int i = 0;i<allMultilessons.Count;i++)
+            {
+                if(usedMultilessons[i]==true) continue;
 
-            
+                bool fitted = false;
+                for(int d = day;d<=workDays;d++)
+                {
+                    fitted |= applyMultilesson(d, i, allMultilessons[i].val.l, +1);
+                    applyMultilesson(d, i, allMultilessons[i].val.l, -1);
+                }
+
+                if(fitted==false) return false;
+            }
+
+            bool res = false;
             if (usedMultilessons[ind] == false)
             {
                 usedMultilessons[ind] = true;
@@ -167,19 +179,6 @@ namespace SchoolManager.Generation_utils
             return successful;
         }
 
-        private static Random rng = new Random();  
-        public static void Shuffle<T>(IList<T> list)  
-        {  
-            int n = list.Count;  
-            while (n > 1) {  
-                n--;  
-                int k = rng.Next(n + 1);  
-                T value = list[k];  
-                list[k] = list[n];  
-                list[n] = value;  
-            }  
-        }
-
         bool solveSuperGroup(int day, int sgInd, int mInd)
         {
             if (superGroups[sgInd].weekLessons == 0)
@@ -229,10 +228,9 @@ namespace SchoolManager.Generation_utils
                 for (int t = 0; t < teachers.Count; t++)
                 {
                     int demand = teacherDemand[t];
-                    int today = 6 - dayState[day].teacherLeftLessons[t];
+                    int today = minLessons - dayState[day].teacherLeftLessons[t];
 
-                    if (today > 6) return false;
-                    if (demand > (workDays - day) * 6) return false;
+                    if (demand > (workDays - day) * minLessons) return false;
                 }
 
                 
@@ -248,10 +246,9 @@ namespace SchoolManager.Generation_utils
             for (int t = 0; t < teachers.Count; t++)
             {
                 int demand = teacherDemand[t];
-                int today = 6 - dayState[day].teacherLeftLessons[t];
+                int today = minLessons - dayState[day].teacherLeftLessons[t];
 
-                if (today > 6) return false;
-                if (demand > (workDays - day+1) * 6 - today) return false;
+                if (demand > (workDays - day+1) * minLessons - today) return false;
             }
 
             if(day!=workDays)
