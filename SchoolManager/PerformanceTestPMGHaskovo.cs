@@ -270,7 +270,7 @@ namespace SchoolManager
         {
             dayLimsGeneral = new List<Tuple<LimitationGroup, int>>();
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("to4ni"), 3));
-            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 3));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("математика"), 2));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
@@ -295,7 +295,9 @@ namespace SchoolManager
             subject2LimGroup.Add("математика", "tochni");
             subject2LimGroup.Add("география", "razkazvatelni");
             subject2LimGroup.Add("история", "razkazvatelni");
-            subject2LimGroup.Add("физика", "razkazvatelni");
+            //subject2LimGroup.Add("физика", "razkazvatelni");
+            subject2LimGroup.Add("биология", "razkazvatelni");
+            //subject2LimGroup.Add("химия", "razkazvatelni");
             subject2LimGroup.Add("английски език", "ezici");
             subject2LimGroup.Add("БЕЛ", "razkazvatelni");
 

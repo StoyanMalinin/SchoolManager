@@ -55,8 +55,7 @@ namespace SchoolManager.ScheduleUtils
                     Color colFromHex = Color.FromArgb(0, 255, 0);
                     excel.Workbook.Worksheets["sheet1"].Cells[2+(day-1)*(days[day].maxLessons+1)+lesson-1, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                     excel.Workbook.Worksheets["sheet1"].Cells[2+(day-1)*(days[day].maxLessons+1)+lesson-1, 1].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                }
-                    
+                }   
 
                 for(int lesson = 1;lesson<=days[day].maxLessons;lesson++)
                 {

@@ -94,6 +94,15 @@ namespace SchoolManager.Generation_utils
 
                 if(fitted==false) return false;
             }
+            for(int t = 0;t<teachers.Count;t++)
+            {
+                int demand = Enumerable.Range(0, allMultilessons.Count).Where(ind => usedMultilessons[ind]==false)
+                .Where(ind => allMultilessons[ind].t.Equals(teachers[t])==true)
+                .Sum(ind => allMultilessons[ind].val.l);
+
+                for(int d = day;d<=workDays;d++) demand -= dayState[d].teacherLeftLessons[t];
+                if(demand>0) return false;
+            }
 
             bool res = false;
             if (usedMultilessons[ind] == false)
@@ -225,6 +234,7 @@ namespace SchoolManager.Generation_utils
             ScheduleGenerator3 sg = null;
             if (sgInd==superGroups.Count)
             {
+                /*
                 for (int t = 0; t < teachers.Count; t++)
                 {
                     int demand = teacherDemand[t];
@@ -232,10 +242,13 @@ namespace SchoolManager.Generation_utils
 
                     if (demand > (workDays - day) * minLessons) return false;
                 }
+                
+                
 
                 
                 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
                 if (sg.gen(day, (day==workDays)) == null) return false;
+                */
 
                 Console.WriteLine($"--------------> {day} {sgInd}");
 

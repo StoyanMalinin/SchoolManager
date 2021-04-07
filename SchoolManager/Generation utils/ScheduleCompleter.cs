@@ -291,24 +291,22 @@ namespace SchoolManager.Generation_utils
                 return;
             }
             reachedStates.Add(currState);
-
-            long[] skeletonStates = new long[teacherSelections.Count];
-            for(int i = 0;i<skeletonStates.Length;i++) skeletonStates[i] = getState(teacherSelections[i], g);
-
+            
             bool failsFound = false;
+            long[] skeletonStates = new long[teacherSelections.Count];
+            
             for(int i = 0;i<teacherSelections.Count;i++)
             {
-                if(teacherSelections[i].failedStates.Contains(skeletonStates[i])==true)
+                if(failsFound==false) skeletonStates[i] = getState(teacherSelections[i], g);
+                if(failsFound==false && teacherSelections[i].failedStates.Contains(skeletonStates[i])==true)
                 {
                     failsFound = true;
-                    continue;
+                    break;
                 }
                 
                 bool fail = false;
-                List <int> gInds = relevantGroups[Enumerable.Range(0, teachers.Count).First(t => teacherSelections[i].isSelected[t]==true)]; 
-                foreach(int gInd in gInds)
+                for(int gInd = g;gInd<state.Count;gInd++)
                 {
-                    if(gInd<=g) continue;
                     if (teacherPermList[gInd].Any(tl => checkSuitable(tl, onlyConsequtive, teacherSelections[i])==true)==false)
                     {
                         fail = true;
@@ -329,7 +327,7 @@ namespace SchoolManager.Generation_utils
                 if (teacherPermList[gInd].Any(tl => checkSuitable(tl, onlyConsequtive)==true)==false) return;
             }
             
-            List<TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true).ToList();
+            List <TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive)==true).ToList();
 
             List <bool> isFailed = new List<bool>();
             for(int i = 0;i<teacherSelections.Count;i++) isFailed.Add(true);
@@ -479,7 +477,14 @@ namespace SchoolManager.Generation_utils
             .Sum(tl => tl.Count(x => ((x.Item1<teachers.Count && x.Item1==ind) || 
             (x.Item1>=teachers.Count))))).ToList(); 
 
-            for (int i = 0; i < 10; i++) 
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[1], sortedTeachers[2]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[2]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1], sortedTeachers[2]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[3], sortedTeachers[4], sortedTeachers[5]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[6], sortedTeachers[7], sortedTeachers[8]}));
+            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[9], sortedTeachers[10], sortedTeachers[11]}));
+            for (int i = 11; i < 10; i++) 
             {
                 teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[i]}));
             }
