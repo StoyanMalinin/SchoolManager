@@ -136,8 +136,9 @@ namespace SchoolManager.Generation_utils
         private List<Tuple <int, Subject>>[] teacherList;
         private IEnumerable<TeacherList>[] teacherPermList;
 
-        private int[] superTeacherInd;
+        private int[] superTeacherInd, superTeacherInd2sgMultilesson;
         private List<int>[] teacherDependees;
+        private List <int>[] supergroupMultilessons2TeacherInds;
 
         private int[,] lessonTeacher;
         private bool[] isTeacherLocked;
@@ -249,10 +250,11 @@ namespace SchoolManager.Generation_utils
                 {
                     if(isTeacherLocked[tl.l[lesson].Item1]==false)
                     {
-                        int sgInd = Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
-                        foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
+                        int sgInd = superTeacherInd2sgMultilesson[tl.l[lesson].Item1];//Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
+                        //foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
+                        foreach(int tInd in supergroupMultilessons2TeacherInds[sgInd])
                         {
-                            int tInd = teachers.FindIndex(x => x.Equals(t) == true);
+                            //int tInd = teachers.FindIndex(x => x.Equals(t) == true);
                             if (lessonTeacher[lesson, tInd] > 0)
                             {
                                 return false;
@@ -270,7 +272,6 @@ namespace SchoolManager.Generation_utils
 
         private void rec(int g, bool onlyConsequtive)
         {
-
             if (output != null) return;
             if (g == state.Count)
             {
@@ -283,7 +284,7 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            if (sw.ElapsedMilliseconds > 2 * 1000) return;
+            if (sw.ElapsedMilliseconds > 1 * 1000) return;
 
             long currState = getState(allTeachersSelected, g);
             if(reachedStates.Contains(currState)==true)
@@ -297,8 +298,8 @@ namespace SchoolManager.Generation_utils
             
             for(int i = 0;i<teacherSelections.Count;i++)
             {
-                if(failsFound==false) skeletonStates[i] = getState(teacherSelections[i], g);
-                if(failsFound==false && teacherSelections[i].failedStates.Contains(skeletonStates[i])==true)
+                skeletonStates[i] = getState(teacherSelections[i], g);
+                if(teacherSelections[i].failedStates.Contains(skeletonStates[i])==true)
                 {
                     failsFound = true;
                     break;
@@ -329,8 +330,9 @@ namespace SchoolManager.Generation_utils
             
             List <TeacherList> teacherLists = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive)==true).ToList();
 
-            List <bool> isFailed = new List<bool>();
-            for(int i = 0;i<teacherSelections.Count;i++) isFailed.Add(true);
+            bool[] isFailed = new bool[teacherSelections.Count];
+            for(int i = 0;i<teacherSelections.Count;i++) 
+                isFailed[i] = true;
             for(int i = 0;i<teacherSelections.Count;i++)
             {
                 if(teacherPermList[g].Count(tl => checkSuitable(tl, onlyConsequtive, teacherSelections[i]))!=teacherLists.Count)
@@ -382,7 +384,7 @@ namespace SchoolManager.Generation_utils
                 }
             }
 
-            for(int i = 0;i<isFailed.Count;i++)
+            for(int i = 0;i<isFailed.Length;i++)
             {
                 if(isFailed[i]==true)
                 {
@@ -416,15 +418,21 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
                 teacherList[g] = new List<Tuple<int, Subject>>();
 
+            superTeacherInd2sgMultilesson = new int[teachers.Count+supergroupMultilessons.Count];
             for (int i = 0; i < supergroupMultilessons.Count; i++)
             {
                 superTeacherInd[i] = teachers.Count + i;
+                superTeacherInd2sgMultilesson[superTeacherInd[i]] = i;
                 teacherDependees[superTeacherInd[i]] = supergroupMultilessons[i].Item1.teachers.Select(x => teachers.FindIndex(t => t.Equals(x))).ToList();
 
                 for(int iter = 0;iter<supergroupMultilessons[i].Item2;iter++)
                     foreach (var item in supergroupMultilessons[i].Item1.groups)
                         teacherList[state.FindIndex(g => g.Equals(item.Item1) == true)].Add(Tuple.Create(superTeacherInd[i], item.Item2));
             }
+
+            supergroupMultilessons2TeacherInds = new List<int>[supergroupMultilessons.Count];
+            for(int i = 0;i<supergroupMultilessons.Count;i++)
+                supergroupMultilessons2TeacherInds[i] = supergroupMultilessons[i].Item1.teachers.Select(t => teachers.FindIndex(x => x.Equals(t)==true)).ToList();
 
             for (int g = 0; g < state.Count; g++)
             {
@@ -477,13 +485,25 @@ namespace SchoolManager.Generation_utils
             .Sum(tl => tl.Count(x => ((x.Item1<teachers.Count && x.Item1==ind) || 
             (x.Item1>=teachers.Count))))).ToList(); 
 
-            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
-            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[1], sortedTeachers[2]}));
-            teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[2]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[1], sortedTeachers[2]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[2]}));
             teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1], sortedTeachers[2]}));
             teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[3], sortedTeachers[4], sortedTeachers[5]}));
             teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[6], sortedTeachers[7], sortedTeachers[8]}));
             teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[9], sortedTeachers[10], sortedTeachers[11]}));
+
+            const int blocksSz = 10;
+            for(int i = 0;i<teachers.Count;i+=blocksSz)
+            {
+                if(i+blocksSz>teachers.Count) break;
+
+                List <int> l = new List<int>();
+                for(int j = i;j<i+blocksSz;j++) l.Add(sortedTeachers[j]);
+
+                teacherSelections.Add(new TeacherSelection(teachers.Count, l));
+            }
+
             for (int i = 11; i < 10; i++) 
             {
                 teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[i]}));

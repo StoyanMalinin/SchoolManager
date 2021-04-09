@@ -217,13 +217,15 @@ namespace SchoolManager.Generation_utils
             return lastConfigSolution[day];
         }
 
-        private DaySchedule generateDay(int day)
+        private DaySchedule generateDay(int day, bool isFinal)
         {
-            if((!(lastConfig[day] is null)) && tryConfig(lastConfig[day], day)==true)
+            /*
+            if(isFinal==true && (!(lastConfig[day] is null)) && tryConfig(lastConfig[day], day)==true)
             {
                 System.Console.WriteLine("SKIPPPPP");
                 return useConfig(lastConfig[day], day);
             }
+            */
             
             G.reset();
 
@@ -303,7 +305,7 @@ namespace SchoolManager.Generation_utils
                             int rm = 0;
                             if(important.Any()==false)
                             {
-                                rm = Math.Min(dayState[d].groups[g].getSubjectDayLim(s), dayState[d].teacherLeftLessons[teacherInd]);
+                                rm = Math.Min(dayState[d].groups[g].getDayBottleneck(s), dayState[d].teacherLeftLessons[teacherInd]);
                                 rm = Math.Min(rm, dayState[d].groupLeftLessons[g]);
                             }
                             else
@@ -314,7 +316,7 @@ namespace SchoolManager.Generation_utils
                             lessonsLeft -= rm;
                         }
 
-                        int subjectLim = Math.Min(dayState[day].groups[g].getSubjectDayLim(s),
+                        int subjectLim = Math.Min(dayState[day].groups[g].getDayBottleneck(s),
                                                   dayState[day].groups[g].getSubjectWeekLim(s));
 
                         int subjectDemand = 0;
@@ -337,7 +339,6 @@ namespace SchoolManager.Generation_utils
                     if (x.parent != null)
                     {
                         int lim = maxLessons;
-                        
                         if(x.GetType() == typeof(LimitationTreeNode))
                             lim = Math.Min(lim, dayState[day].groups[g].getLimGroupDayLim((x as LimitationTreeNode).lg));
 
@@ -500,14 +501,55 @@ namespace SchoolManager.Generation_utils
                 if(demand>0) return false;
             }
 
+            System.Console.WriteLine("do tuka");
+
             for(int g = 0;g<dayState[1].groups.Count;g++)
             {
                 for(int s = 0;s<dayState[1].groups[g].subject2Teacher.Count;s++)
                 {
-                    int demand = dayState[1].groups[g].getSubjectWeekLim(s);
-                    for(int d = day;d<=workDays;d++) demand -= dayState[d].groups[g].getDayBottleneck(s);
+                    if(dayState[1].groups[g].subject2Teacher[s].Item2 is null) continue;
+                    int tInd = groupSubject2Teacher[g, s];
 
-                    if(demand>0) return false;
+                    int demand = dayState[1].groups[g].getSubjectWeekLim(s); 
+                    for (int d = day; d <= workDays; d++)
+                    {
+                        IEnumerable <Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g])==true 
+                                                                                && m.s.Equals(dayState[1].groups[g].subject2Teacher[s].Item1) == true);
+                        
+                        int rm = 0;
+                        if(important.Any()==false)
+                        {
+                            rm = Math.Min(dayState[d].groups[g].getDayBottleneck(s), dayState[d].teacherLeftLessons[tInd]);
+                            rm = Math.Min(rm, dayState[d].groupLeftLessons[g]);
+                        }
+                        else
+                        {
+                            rm = important.Sum(m => m.val.r);
+                        }
+
+                        demand -= rm;
+                    }
+
+                    if(demand>0) 
+                    {
+                        System.Console.WriteLine("nqma da mozhem da gi vzemem");
+                        return false;
+                    }
+                }
+
+                for(int s = 0;s<dayState[1].groups[g].subject2Teacher.Count;s++)
+                {
+                    int demand = dayState[1].groups[g].getSubjectWeekLim(s);
+                    for(int d = day;d<=workDays;d++)
+                    {
+                        demand -= multilessons[d].Where(m => m.g.Equals(groups[g])==true && m.s.Equals(groups[g].subject2Teacher[s])==true).Sum(m => m.val.l);
+                    }
+                    
+                    if(demand<0) 
+                    {
+                        System.Console.WriteLine("oldqhte se");
+                        return false;
+                    }
                 }
             }
 
@@ -521,12 +563,27 @@ namespace SchoolManager.Generation_utils
                     LimitationGroup lg = (x as LimitationTreeNode).lg;
                     if(!(lg is null))
                     {
-                        int demand = dayState[1].groups[g].subject2Teacher.Where(tup => tup.Item1.limGroups.Contains(lg)==true)
+                        int demand = dayState[1].groups[g].subject2Teacher.Where(tup => tup.Item1.limGroups.Any(x => x.Equals(lg)==true)==true)
                         .Sum(tup => dayState[1].groups[g].getSubjectWeekLim(dayState[1].groups[g].findSubject(tup.Item1)));
 
                         for(int d = day;d<=workDays;d++)
-                            demand -= Math.Min(dayState[d].groups[g].getLimGroupDayLim(lg), dayState[d].groupLeftLessons[g]);
+                        {
+                            IEnumerable<Multilesson> important = multilessons[d].Where(m => m.g.Equals(groups[g]) == true
+                                                                                && m.s.limGroups.Contains((x as LimitationTreeNode).lg)==true);
 
+                            int rm = 0;
+                            if (important.Any() == false)
+                            {
+                                rm = Math.Min(dayState[d].groups[g].getLimGroupDayLim((x as LimitationTreeNode).lg), dayState[d].groupLeftLessons[g]);
+                            }
+                            else
+                            {
+                                rm = important.Sum(m => m.val.r);
+                            }
+
+                            demand -= rm;
+                        }
+                            
                         if(demand>0) fail = true;
                     }
 
@@ -595,12 +652,12 @@ namespace SchoolManager.Generation_utils
 
             for (int day = 1;day<=limDay;day++)
             {
-                if(checkPossible(day)==false) 
+                if(isFinal==true && checkPossible(day)==false) 
                 {
                     System.Console.WriteLine("FAKKKKKKKKKKKK");
                     //return null;
                 }
-                DaySchedule dayRes = generateDay(day);
+                DaySchedule dayRes = generateDay(day, isFinal);
 
                 if (dayRes == null) return null;
                 ws.days[day] = dayRes;
@@ -612,50 +669,6 @@ namespace SchoolManager.Generation_utils
             Console.WriteLine("davai volene");
             succsefullCallNum++;
             
-            /*  
-            if(isFinal==true)
-            {
-                /*
-                for(int g = 0;g<groups.Count;g++)
-                {
-                    if(dayState[1].groups[g].name=="12а") 
-                    {
-                        for(int d = 1;d<=workDays;d++) 
-                        {
-                            for(int l = 1;l<=maxLessons;l++) 
-                                if(ws.days[d].lessonGroup2Subject[l, g]!=null) Console.Write($"{ws.days[d].lessonGroup2Subject[l, g].name} ");
-                            System.Console.WriteLine();
-                        }
-                    }
-                }
-
-                for(int t = 0;t<teachers.Count;t++)
-                {
-                    if(teachers[t].name=="Данева")
-                    {
-                        for(int d = 1;d<=workDays;d++) 
-                        {
-                            for(int l = 1;l<=maxLessons;l++)
-                                if(ws.days[d].lessonTeacher2Group[l, t]!=null) Console.Write($"{ws.days[d].lessonTeacher2Group[l, t].name} ");
-                            System.Console.WriteLine();
-                        }
-                    }
-                }
-                for(int g = 0;g<groups.Count;g++)
-                {
-                    if(groups[g].name=="11а")
-                    {
-                        for(int d = 1;d<=workDays;d++)
-                        {
-                            for(int l = 1;l<=maxLessons;l++)
-                                if(ws.days[d].lessonGroup2Subject[l, g]!=null)
-                                    System.Console.WriteLine($"({ws.days[d].lessonGroup2Subject[l, g].name}, {groups[g].subject2Teacher[groups[g].findSubject(ws.days[d].lessonGroup2Subject[l, g])].Item2})");
-                        }
-                    }
-                }
-            }
-            */
-
             return ws;
         }
     }

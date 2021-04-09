@@ -243,7 +243,22 @@ namespace SchoolManager
                         dayLims = dayLimsGeneral;
                         System.Console.WriteLine($"{gName} sa generali");
                     }
-                    else dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).ToList();
+                    else if(gName.Length<=3 && gName.Last()=='д' && gName[0]!='8')
+                    {
+                        dayLims = dayLimsBiology;
+                        System.Console.WriteLine($"{gName} sa biolozi");
+                    }
+                    else if(gName[0]=='8')
+                    {
+                        dayLims = dayLims8Grade;
+                        System.Console.WriteLine($"{gName} sa osmi");
+                    }
+                    else
+                    {
+                        dayLims = dayLimsClashers;
+                        System.Console.WriteLine($"{gName} sa clashari");
+                    }
+                    //else dayLims = weekLims.Select(t => Tuple.Create(t.Item1, Math.Min(t.Item2, 5))).ToList();
 
                     //Console.WriteLine($"{gName} -> {string.Join(", ", subject2TeacherName)}");
                    // Console.WriteLine(string.Join("\n", weekLims.Select(t => $"{t.Item1.name} -> {t.Item2}")));
@@ -264,12 +279,12 @@ namespace SchoolManager
         private static List<Group> groups;
         private static LimitationTreeNode higharchy = new LimitationTreeNode("root", null);
 
-        private static List <Tuple <LimitationGroup, int>> dayLimsGeneral;
+        private static List <Tuple <LimitationGroup, int>> dayLimsGeneral, dayLimsBiology, dayLims8Grade, dayLimsClashers;
 
         private static void loadDayLimsGeneral()
         {
             dayLimsGeneral = new List<Tuple<LimitationGroup, int>>();
-            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("to4ni"), 3));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("to4ni"), 4));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 3));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("математика"), 2));
@@ -281,25 +296,73 @@ namespace SchoolManager
                 dayLimsGeneral.Add(Tuple.Create(new LimitationGroup(s.name), 2));
         }
 
+        private static void loadDayLimsBiology()
+        {
+            dayLimsBiology = new List<Tuple<LimitationGroup, int>>();
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("to4ni"), 3));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("математика"), 2));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+
+            foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsBiology.Any(t => t.Item1.name==x.name)==false))
+                dayLimsBiology.Add(Tuple.Create(new LimitationGroup(s.name), 2));
+        }
+
+        private static void loadDayLims8Grade()
+        {
+            dayLims8Grade = new List<Tuple<LimitationGroup, int>>();
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("to4ni"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("математика"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("английски език"), 4));
+
+            foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLims8Grade.Any(t => t.Item1.name==x.name)==false))
+                dayLims8Grade.Add(Tuple.Create(new LimitationGroup(s.name), 2));
+        }
+
+        private static void loadDayLimsClashers()
+        {
+            dayLimsClashers = new List<Tuple<LimitationGroup, int>>();
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("to4ni"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("математика"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("английски език"), 4));
+
+            foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsClashers.Any(t => t.Item1.name==x.name)==false))
+                dayLimsClashers.Add(Tuple.Create(new LimitationGroup(s.name), 2));
+        }
+
         private static void loadDayLims()
         {
             loadDayLimsGeneral();
+            loadDayLimsBiology();
+            loadDayLims8Grade();
+            loadDayLimsClashers();
         }
 
         private static void loadHigharcy()
         {
             limitationGroups.Where(lg => subjects.Any(s => s.name==lg.name)==false).ToList().ForEach(lg => higharchy.addChild(new LimitationTreeNode(lg)));
-            //subjects.ForEach(s => higharchy.addChild(new SubjectTreeNode(s)));
             
             Dictionary <string, string> subject2LimGroup = new Dictionary<string, string>();
             subject2LimGroup.Add("математика", "tochni");
             subject2LimGroup.Add("география", "razkazvatelni");
             subject2LimGroup.Add("история", "razkazvatelni");
-            //subject2LimGroup.Add("физика", "razkazvatelni");
+            subject2LimGroup.Add("физика", "razkazvatelni");
             subject2LimGroup.Add("биология", "razkazvatelni");
-            //subject2LimGroup.Add("химия", "razkazvatelni");
+            subject2LimGroup.Add("химия", "razkazvatelni");
             subject2LimGroup.Add("английски език", "ezici");
-            subject2LimGroup.Add("БЕЛ", "razkazvatelni");
 
             foreach(Subject s in subjects)
             {
@@ -325,6 +388,7 @@ namespace SchoolManager
                 if(subject2LimGroup.ContainsKey(s.name)==true) node = dfs(higharchy, subject2LimGroup[s.name]);
 
                 if(node==null) node = higharchy;
+                else s.limGroups.Add((node as LimitationTreeNode).lg);
 
                 System.Console.WriteLine($"{s.name} --> {node.name}");
                 (node as LimitationTreeNode).addChild(new SubjectTreeNode(s));
@@ -356,6 +420,7 @@ namespace SchoolManager
 
             teachers = teacherNames.Select(t => new Teacher(t, new List<Subject>() { })).ToList();
             subjects = subjectNames.Select(s => new Subject(s, new List<LimitationGroup>() { limitationGroups.First(lg => lg.name==s)})).ToList();
+            loadHigharcy();
             loadDayLims();
             
             groups = getGroups(filename, excellSuperGroups, subjects, teachers, limitationGroups, subjectNames);
@@ -398,8 +463,6 @@ namespace SchoolManager
                 superGroups.Add(sg);
                 //Console.WriteLine($"{string.Join(", ", excellSuperGroups[i].groups)} -> {sg.weekLessons}");
             }
-
-            loadHigharcy();
         }
 
         public static void test(string filename)
