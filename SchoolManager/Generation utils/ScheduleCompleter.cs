@@ -136,9 +136,8 @@ namespace SchoolManager.Generation_utils
         private List<Tuple <int, Subject>>[] teacherList;
         private IEnumerable<TeacherList>[] teacherPermList;
 
-        private int[] superTeacherInd, superTeacherInd2sgMultilesson;
+        private int[] superTeacherInd;
         private List<int>[] teacherDependees;
-        private List <int>[] supergroupMultilessons2TeacherInds;
 
         private int[,] lessonTeacher;
         private bool[] isTeacherLocked;
@@ -149,35 +148,36 @@ namespace SchoolManager.Generation_utils
 
         private long getState(TeacherSelection ts, int g)
         {
-            long state = 0;
+            long stateVal = 0;
             
             const long key = 1019;
             const long mod = 67772998972500529;
             const long emptySymbol = key - 1;
             const long separatingSymbol = key - 2;
 
-            state = (state*key + g + 1)%mod;
+            stateVal = (stateVal*key + g + 1)%mod;
             for(int i = 0;i<ts.isSelected.Length;i++)
-                state = (state*key + Convert.ToInt64(ts.isSelected[i]) + 1);
-            state = (state*key + separatingSymbol)%mod;
+                stateVal = (stateVal*key + Convert.ToInt64(ts.isSelected[i]) + 1);
+            stateVal = (stateVal*key + separatingSymbol)%mod;
 
             for(int lesson = 0;lesson<maxLessons;lesson++)
             {
                 for(int t = 0;t<teachers.Count+supergroupMultilessons.Count+1;t++)
                 {
+
                     if(t<teachers.Count)
                     {
-                        if(ts.isSelected[t]==false) state = (state*key + emptySymbol)%mod;
-                        else state = (state*key + lessonTeacher[lesson, t] + 1)%mod;
+                        if(ts.isSelected[t]==false) stateVal = (stateVal*key + emptySymbol)%mod;
+                        else stateVal = (stateVal*key + lessonTeacher[lesson, t] + 1)%mod;
                     }
                     else
                     {
-                        state = (state*key + lessonTeacher[lesson, t] + 1)%mod;
+                        stateVal = (stateVal*key + lessonTeacher[lesson, t] + 1)%mod;
                     }
                 }
             }
 
-            return state;
+            return stateVal;
         }
 
         private List<TeacherList> genPerms(List<Tuple <int, Subject>> l)
@@ -250,9 +250,9 @@ namespace SchoolManager.Generation_utils
                 {
                     if(isTeacherLocked[tl.l[lesson].Item1]==false)
                     {
-                        int sgInd = superTeacherInd2sgMultilesson[tl.l[lesson].Item1];//Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
+                        //int sgInd = superTeacherInd2sgMultilesson[tl.l[lesson].Item1];//Enumerable.Range(0, supergroupMultilessons.Count).First(ind => superTeacherInd[ind] == tl.l[lesson].Item1);
                         //foreach (Teacher t in supergroupMultilessons[sgInd].Item1.teachers)
-                        foreach(int tInd in supergroupMultilessons2TeacherInds[sgInd])
+                        foreach(int tInd in teacherDependees[tl.l[lesson].Item1])
                         {
                             //int tInd = teachers.FindIndex(x => x.Equals(t) == true);
                             if (lessonTeacher[lesson, tInd] > 0)
@@ -284,7 +284,7 @@ namespace SchoolManager.Generation_utils
                 return;
             }
 
-            if (sw.ElapsedMilliseconds > 1 * 1000) return;
+            if (sw.ElapsedMilliseconds > 0.5 * 1000) return;
 
             long currState = getState(allTeachersSelected, g);
             if(reachedStates.Contains(currState)==true)
@@ -359,7 +359,6 @@ namespace SchoolManager.Generation_utils
                 }
                     
                 rec(g + 1, onlyConsequtive);
-
                 for(int i = 0;i<teacherSelections.Count;i++)
                 {
                     if(isFailed[i]==false) continue;
@@ -418,21 +417,15 @@ namespace SchoolManager.Generation_utils
             for (int g = 0; g < state.Count; g++)
                 teacherList[g] = new List<Tuple<int, Subject>>();
 
-            superTeacherInd2sgMultilesson = new int[teachers.Count+supergroupMultilessons.Count];
             for (int i = 0; i < supergroupMultilessons.Count; i++)
             {
                 superTeacherInd[i] = teachers.Count + i;
-                superTeacherInd2sgMultilesson[superTeacherInd[i]] = i;
                 teacherDependees[superTeacherInd[i]] = supergroupMultilessons[i].Item1.teachers.Select(x => teachers.FindIndex(t => t.Equals(x))).ToList();
 
                 for(int iter = 0;iter<supergroupMultilessons[i].Item2;iter++)
                     foreach (var item in supergroupMultilessons[i].Item1.groups)
                         teacherList[state.FindIndex(g => g.Equals(item.Item1) == true)].Add(Tuple.Create(superTeacherInd[i], item.Item2));
             }
-
-            supergroupMultilessons2TeacherInds = new List<int>[supergroupMultilessons.Count];
-            for(int i = 0;i<supergroupMultilessons.Count;i++)
-                supergroupMultilessons2TeacherInds[i] = supergroupMultilessons[i].Item1.teachers.Select(t => teachers.FindIndex(x => x.Equals(t)==true)).ToList();
 
             for (int g = 0; g < state.Count; g++)
             {
@@ -457,7 +450,6 @@ namespace SchoolManager.Generation_utils
                         teacherList[g].Add(Tuple.Create(t, state[g].subject2Teacher[s].Item1));
                 }
             }
-
             relevantGroups = new List<int>[teachers.Count];
             for(int t = 0;t<teachers.Count;t++)
             {
@@ -485,6 +477,12 @@ namespace SchoolManager.Generation_utils
             .Sum(tl => tl.Count(x => ((x.Item1<teachers.Count && x.Item1==ind) || 
             (x.Item1>=teachers.Count))))).ToList(); 
 
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[1]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[2]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[3]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[4]}));
+            //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[5]}));
             //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[1]}));
             //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[1], sortedTeachers[2]}));
             //teacherSelections.Add(new TeacherSelection(teachers.Count, new List<int>(){sortedTeachers[0], sortedTeachers[2]}));

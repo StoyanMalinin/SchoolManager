@@ -216,7 +216,11 @@ namespace SchoolManager
                                 continue;
                             }
 
-                            subject2TeacherName.Add(Tuple.Create(subject, teacherNames[0]));
+                            string tName = teacherNames[0];
+                            if(tName=="Петров ФВС") tName = "Петров";
+
+                            subject2TeacherName.Add(Tuple.Create(subject, tName));
+
                         }
                     }
 
