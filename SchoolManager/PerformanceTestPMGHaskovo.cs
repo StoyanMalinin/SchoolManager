@@ -87,7 +87,7 @@ namespace SchoolManager
             using (var package = new ExcelPackage(new FileInfo(path)))
             {
                 var sheetTeacher = package.Workbook.Worksheets["По класове"];
-                var sheetSubject = package.Workbook.Worksheets["По класове - предмети"];
+                var sheetSubject = package.Workbook.Worksheets["ХЕИ"];
 
                 Dictionary<SuperGroupExcell, List<SuperGroupExcell>> superGroups = new Dictionary<SuperGroupExcell, List<SuperGroupExcell>>();
                 for (int l = 1; l <= 7; l++)
@@ -97,10 +97,12 @@ namespace SchoolManager
                         List<SuperGroupExcell> currSuperGroups = new List<SuperGroupExcell>();
                         for (int g = 0; g < groupsCnt; g++)
                         {
-                            string subject = sheetSubject.Cells[4 + g * 8 + l - 1, 3 + day - 1].Text;
+                            string subject = sheetSubject.Cells[20 + g * 9 + l - 1, 3 + day - 1].Text;
                             List<string> teachers = sheetTeacher.Cells[2 + g * 9 + l, 3 * day].Text.Split('/').ToList();
 
                             if (subject == "") continue;
+                            if(subject=="0") continue;
+                            if(subject=="ИТ") subject = "ИТ/ИТ";
 
                             SuperGroupExcell sg = new SuperGroupExcell(sheetTeacher.Cells[2 + g * 9, 1].Text, subject, teachers, Tuple.Create(g, l, day));
                             int ind = currSuperGroups.FindIndex(x => x.isIntersecting(sg) == true);
@@ -138,7 +140,7 @@ namespace SchoolManager
             List<string> subjects = new List<string>();
             using (var package = new ExcelPackage(new FileInfo(path)))
             {
-                var sheetSubject = package.Workbook.Worksheets["По класове - предмети"];
+                var sheetSubject = package.Workbook.Worksheets["ХЕИ"];
 
                 for (int l = 1; l <= 7; l++)
                 {
@@ -146,13 +148,13 @@ namespace SchoolManager
                     {
                         for (int g = 0; g < groupsCnt; g++)
                         {
-                            subjects.Add(sheetSubject.Cells[4 + g * 8 + l - 1, 3 + day - 1].Text);
+                            subjects.Add(sheetSubject.Cells[20 + g * 9 + l - 1, 3 + day - 1].Text);
                         }
                     }
                 }
             }
 
-            return subjects.Where(x => x!="").Distinct().ToList();
+            return subjects.Where(x => x!="" && x!="0" && x!="ИТ").Distinct().ToList();
         }
 
         private static List <string> getTeachers(string filename)
@@ -192,7 +194,7 @@ namespace SchoolManager
             using (var package = new ExcelPackage(new FileInfo(path)))
             {
                 var sheetTeacher = package.Workbook.Worksheets["По класове"];
-                var sheetSubject = package.Workbook.Worksheets["По класове - предмети"];
+                var sheetSubject = package.Workbook.Worksheets["ХЕИ"];
 
                 for (int g = 0; g < groupsCnt; g++)
                 {
@@ -200,15 +202,21 @@ namespace SchoolManager
 
                     List<string> allSubjects = new List<string>();
                     List<Tuple<string, string>> subject2TeacherName = new List<Tuple<string, string>>();
-
+                    
+                    System.Console.WriteLine($"Group {gName}");
                     for (int l = 1; l <= 7; l++)
                     {
                         for (int day = 1; day <= workDays; day++)
                         {
-                            string subject = sheetSubject.Cells[4 + g * 8 + l - 1, 3 + day - 1].Text;
+                            string subject = sheetSubject.Cells[20 + g * 9 + l - 1, 3 + day - 1].Text;
                             List<string> teacherNames = sheetTeacher.Cells[2 + g * 9 + l, 3 * day].Text.Split('/').ToList();
+                            
+                            //System.Console.WriteLine($"lesson {l} day {day} => {subject}");
 
                             if (subject == "") continue;
+                            if(subject=="0") continue;
+                            if(subject=="ИТ") subject = "ИТ/ИТ";
+
                             allSubjects.Add(subject);
 
                             if (superGroupExcells.Any(x => x.positions.Any(p => p.Item1 == g && p.Item2 == l && p.Item3 == day) == true) == true)
@@ -292,9 +300,9 @@ namespace SchoolManager
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 3));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("математика"), 2));
-            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("бълг. език"), 2));
             dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
-            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLimsGeneral.Add(Tuple.Create(new LimitationGroup("II - ри чужд език"), 2));
 
             foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsGeneral.Any(t => t.Item1.name==x.name)==false))
                 dayLimsGeneral.Add(Tuple.Create(new LimitationGroup(s.name), 2));
@@ -307,9 +315,9 @@ namespace SchoolManager
             dayLimsBiology.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
             dayLimsBiology.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLimsBiology.Add(Tuple.Create(new LimitationGroup("математика"), 2));
-            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("бълг. език"), 2));
             dayLimsBiology.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
-            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLimsBiology.Add(Tuple.Create(new LimitationGroup("II - ри чужд език"), 2));
 
             foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsBiology.Any(t => t.Item1.name==x.name)==false))
                 dayLimsBiology.Add(Tuple.Create(new LimitationGroup(s.name), 2));
@@ -322,9 +330,9 @@ namespace SchoolManager
             dayLims8Grade.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 4));
             dayLims8Grade.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLims8Grade.Add(Tuple.Create(new LimitationGroup("математика"), 2));
-            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("бълг. език"), 2));
             dayLims8Grade.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
-            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLims8Grade.Add(Tuple.Create(new LimitationGroup("II - ри чужд език"), 2));
             dayLims8Grade.Add(Tuple.Create(new LimitationGroup("английски език"), 4));
 
             foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLims8Grade.Any(t => t.Item1.name==x.name)==false))
@@ -338,9 +346,9 @@ namespace SchoolManager
             dayLimsClashers.Add(Tuple.Create(new LimitationGroup("razkazvatelni"), 2));
             dayLimsClashers.Add(Tuple.Create(new LimitationGroup("ezici"), 4));
             dayLimsClashers.Add(Tuple.Create(new LimitationGroup("математика"), 2));
-            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("БЕЛ"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("бълг. език"), 2));
             dayLimsClashers.Add(Tuple.Create(new LimitationGroup("информатика"), 2));
-            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("2 - ри чужд език"), 2));
+            dayLimsClashers.Add(Tuple.Create(new LimitationGroup("II - ри чужд език"), 2));
             dayLimsClashers.Add(Tuple.Create(new LimitationGroup("английски език"), 4));
 
             foreach(Subject s in subjects.Where(x => !(x is null)).Where(x => dayLimsClashers.Any(t => t.Item1.name==x.name)==false))
@@ -430,12 +438,12 @@ namespace SchoolManager
             groups = getGroups(filename, excellSuperGroups, subjects, teachers, limitationGroups, subjectNames);
             foreach(Group g in groups)
             {
-                g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="БЕЛ").Item2, 
-                                                                               g.subject2Teacher.First(t => t.Item1.name=="БЕЛ").Item1, 
+                g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="бълг. език").Item2, 
+                                                                               g.subject2Teacher.First(t => t.Item1.name=="бълг. език").Item1, 
                                                                                new Generation_utils.IntInInterval(2, 2)));
 
                 if(g.name.Last()!='д')
-                {
+                { 
                      g.requiredMultilessons.Add(new Generation_utils.Multilesson(g, g.subject2Teacher.First(t => t.Item1.name=="математика").Item2, 
                                                                                g.subject2Teacher.First(t => t.Item1.name=="математика").Item1, 
                                                                                new Generation_utils.IntInInterval(2, 2)));
@@ -455,7 +463,7 @@ namespace SchoolManager
                 List <int> multilessons = new List<int>();
 
                 System.Console.WriteLine($"---------- {excellSuperGroups[i].groups[0].Item2}");
-                if(excellSuperGroups[i].groups[0].Item2=="2 - ри чужд език") 
+                if(excellSuperGroups[i].groups[0].Item2=="II - ри чужд език") 
                 {
                     System.Console.WriteLine("ima go");
                     multilessons.Add(2);
@@ -483,8 +491,15 @@ namespace SchoolManager
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            sg.gen();
+            SchoolManager.ScheduleUtils.WeekSchedule res = sg.gen();
             
+            if(!(res is null))
+            {
+                res.print();
+                res.exportToExcell($"{filename}_myVersion");
+            }
+
+
             System.Console.WriteLine($"Total ellapsed time = {sw.ElapsedMilliseconds}");
             sw.Stop();
         }

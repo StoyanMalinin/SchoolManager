@@ -242,13 +242,10 @@ namespace SchoolManager.Generation_utils
 
                     if (demand > (workDays - day) * minLessons) return false;
                 }
-                
-                
-
+                */
                 
                 sg = new ScheduleGenerator3(groups, teachers, subjects, higharchy, multilessons, supergroupMultilessons);
                 if (sg.gen(day, (day==workDays)) == null) return false;
-                */
 
                 Console.WriteLine($"--------------> {day} {sgInd}");
 
@@ -334,11 +331,13 @@ namespace SchoolManager.Generation_utils
             Console.WriteLine($"allMultilessons = {allMultilessons.Count}");
             bool res = arrangeSuperGroups(0, 1);
 
+            /*
             if(res==true)
             {
                 ans.print();
                 ans.exportToExcell("programa1");
             }
+            */
 
             return ans;
         }

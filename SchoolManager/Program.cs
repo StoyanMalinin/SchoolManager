@@ -10,21 +10,15 @@ namespace SchoolManager
     {
         static void Main(string[] args)
         {
-            /*
-            IEnumerable<int> kur = new HashSet<int>() { 1, 2, 2, 3 };
-            Console.WriteLine(kur.Count(x => true));
+            List <string> filenames = new List<string>()
+            {
+                "Programa-2019-2020-I-srok",
+                "Programa-2019-2020-II-srok",
+                "Programa-2018-2019-I-srok",
+                    "Programa-2018-2019-II-srok",
+            };         
 
-            kur = kur.ToList();
-            Console.WriteLine(kur.Count(x => true));
-
-            kur = kur.Where(x => true);
-            Console.WriteLine(kur.Count(x => true));
-
-            kur = new List<int>() { 1, 4};
-            Console.WriteLine(kur.Count(x => true));
-            */
-
-            PerformanceTestPMGHaskovo.test("Programa-2019-2020-I-srok");
+            PerformanceTestPMGHaskovo.test(filenames[0]);
             //PerformanceTest1.test();
         }
     }
