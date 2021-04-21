@@ -15,10 +15,10 @@ namespace SchoolManager
                 "Programa-2019-2020-I-srok",
                 "Programa-2019-2020-II-srok",
                 "Programa-2018-2019-I-srok",
-                    "Programa-2018-2019-II-srok",
+                "Programa-2018-2019-II-srok",
             };         
 
-            PerformanceTestPMGHaskovo.test(filenames[0]);
+            PerformanceTestPMGHaskovo.test(filenames[3]);
             //PerformanceTest1.test();
         }
     }

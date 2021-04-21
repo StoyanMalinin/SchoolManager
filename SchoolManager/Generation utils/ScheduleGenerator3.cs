@@ -434,14 +434,18 @@ namespace SchoolManager.Generation_utils
             }
 
             Console.WriteLine("pak faida e ");
+            DaySchedule ds = null;
+            
             ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
-            DaySchedule ds = sc.gen(true);
+            ds = sc.gen(true);
 
             if(!(ds is null)) 
             {
                 lastConfigSolution[day] = ds;
                 lastConfig[day] = currConfig;
             }
+            
+            
             return ds;
         }
 
