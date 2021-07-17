@@ -436,7 +436,7 @@ namespace SchoolManager.Generation_utils
             Console.WriteLine("pak faida e ");
             DaySchedule ds = null;
             
-            ScheduleCompleter sc = new ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
+            ScheduleCompleters.DFS.ScheduleCompleter sc = new ScheduleCompleters.DFS.ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
             ds = sc.gen(true);
 
             if(!(ds is null)) 

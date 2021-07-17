@@ -43,7 +43,6 @@ C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Relea
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.runtimeconfig.dev.json
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.dll
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Release\netcoreapp3.1\SchoolManager.pdb
-C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csprojAssemblyReference.cache
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.AssemblyInfoInputs.cache
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.AssemblyInfo.cs
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csproj.CoreCompileInputs.cache
@@ -71,3 +70,4 @@ C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Relea
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Release\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Release\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csproj.CopyComplete
+C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Release\netcoreapp3.1\SchoolManager.csproj.AssemblyReference.cache

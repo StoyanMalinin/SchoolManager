@@ -43,7 +43,6 @@ C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Debug
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Debug\netcoreapp3.1\SchoolManager.runtimeconfig.dev.json
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Debug\netcoreapp3.1\SchoolManager.dll
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\bin\Debug\netcoreapp3.1\SchoolManager.pdb
-C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Debug\netcoreapp3.1\SchoolManager.csprojAssemblyReference.cache
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Debug\netcoreapp3.1\SchoolManager.AssemblyInfoInputs.cache
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Debug\netcoreapp3.1\SchoolManager.AssemblyInfo.cs
 C:\Users\Stoyan\Desktop\Stoyan\Work\bahti proekta chovek\SchoolManager\obj\Debug\netcoreapp3.1\SchoolManager.csproj.CoreCompileInputs.cache
