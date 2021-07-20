@@ -8,23 +8,23 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
 {
     class ConfigurationStateBase
     {
-        protected int maxLessons;
+        protected readonly int maxLessons;
 
-        protected List<Group> state;
-        protected bool onlyConsequtive;
-        protected List<Teacher> teachers;
-        protected List<Tuple<SuperGroup, int>> supergroupMultilessons;
+        protected readonly List<Group> state;
+        protected readonly bool onlyConsequtive;
+        protected readonly List<Teacher> teachers;
+        protected readonly List<Tuple<SuperGroup, int>> supergroupMultilessons;
 
-        protected int[] lastPosSeen;
+        protected readonly int[] lastPosSeen;
         protected int[,] lessonTeacher;
         protected bool[] isTeacherLocked;
         protected bool[,] teacherPosLocked;
 
-        public int[] superTeacherInd;
-        protected List<int>[] teacherDependees;
+        public readonly int[] superTeacherInd;
+        protected readonly List<int>[] teacherDependees;
 
-        public List<Tuple<int, Subject>>[] teacherList;
-        public IEnumerable<TeacherList>[] teacherPermList;
+        public readonly List<Tuple<int, Subject>>[] teacherList;
+        public readonly IEnumerable<TeacherList>[] teacherPermList;
 
         public ConfigurationStateBase(List<Group> state, List<Teacher> teachers, List<Tuple<SuperGroup, int>> supergroupMultilessons, bool onlyConsequtive, int maxLessons)
         {
@@ -115,8 +115,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
 
             for (int g = 0; g < state.Count; g++)
             {
-                teacherPermList[g] = genPerms(teacherList[g]);
-                teacherPermList[g] = teacherPermList[g].Where(t => t.isGood == true || onlyConsequtive == false);
+                teacherPermList[g] = genPerms(teacherList[g]).Where(t => t.isGood == true || onlyConsequtive == false).ToList();
             }
         }
 
@@ -135,7 +134,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
                 {
                     cnt++;
 
-                    List<Tuple<int, Subject>> cpy = new List<Tuple<int, Subject>>(curr.Select(x => x).ToList());
+                    List<Tuple<int, Subject>> cpy = curr.Select(x => x).ToList();
                     ans.Add(new TeacherList(cnt, cpy));
 
                     return;
@@ -196,7 +195,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
             return true;
         }
 
-        public void applyPermution(TeacherList tl)
+        public virtual void applyPermution(TeacherList tl)
         {
             for (int lesson = 0; lesson < tl.l.Count; lesson++)
             {
@@ -215,7 +214,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
             }
         }
 
-        public void undoPermutation(TeacherList tl)
+        public virtual void undoPermutation(TeacherList tl)
         {
             for (int lesson = 0; lesson < tl.l.Count; lesson++)
             {

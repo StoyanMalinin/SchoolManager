@@ -435,15 +435,30 @@ namespace SchoolManager.Generation_utils
 
             Console.WriteLine("pak faida e ");
             DaySchedule ds = null;
-            
-            ScheduleCompleters.DFS.ScheduleCompleter sc = new ScheduleCompleters.DFS.ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
-            ds = sc.gen(true);
 
-            if(!(ds is null)) 
+            if(ds is null)
             {
-                lastConfigSolution[day] = ds;
-                lastConfig[day] = currConfig;
+                ScheduleCompleters.DFS.ScheduleCompleter sc = new ScheduleCompleters.DFS.ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
+                ds = sc.gen(true);
+
+                if (!(ds is null))
+                {
+                    lastConfigSolution[day] = ds;
+                    lastConfig[day] = currConfig;
+                }
             }
+            if(ds is null)
+            {
+                ScheduleCompleters.GeneticAlgorithm.ScheduleCompleter sc = new ScheduleCompleters.GeneticAlgorithm.ScheduleCompleter(dayState[day].groups, teachers, supergroupMultilessons[day], maxLessons);
+                ds = sc.gen(true);
+
+                if (!(ds is null))
+                {
+                    lastConfigSolution[day] = ds;
+                    lastConfig[day] = currConfig;
+                }
+            }
+            
             
             
             return ds;

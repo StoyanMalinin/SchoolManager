@@ -18,6 +18,20 @@ namespace SchoolManager.ScheduleUtils
         public Group[,] lessonTeacher2Group;
         public SuperGroup[,] lessonTeacher2SuperGroup; 
 
+        public DaySchedule(List<Tuple<int, Subject>>[] solution, List<Group> state, List <Teacher> teachers, 
+                           List<Tuple<SuperGroup, int>> supergroupMultilessons, 
+                           Generation_utils.ScheduleCompleters.ConfigurationStateBase config,
+                           int maxLessons) 
+                           : this(solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null) ? null : y.Item2)).ToList()).ToList(),
+                           teachers, state,
+                           solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null || y.Item1 < teachers.Count) ? null
+                           : supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count)
+                                                              .First(ind => config.superTeacherInd[ind] == y.Item1)].Item1)).ToList()).ToList()
+                           , maxLessons)
+        {
+
+        }
+
         public DaySchedule(List <List<Subject>> orderedCurriculums, List <Teacher> teachers, List <Group> groups, 
                            List <List<SuperGroup>> orderedSuperGroupCurriculums, int maxLessons)
         {
