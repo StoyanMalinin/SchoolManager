@@ -666,16 +666,16 @@ namespace SchoolManager
             List<SuperGroup> superGroups = new List<SuperGroup>();
 
             groups.Add(_12a());
-            groups.Add(_12b());
-            groups.Add(_12v());
+            //groups.Add(_12b());
+            //groups.Add(_12v());
             groups.Add(_12g());
             groups.Add(_11a());
             groups.Add(_11b());
             groups.Add(_11v());
             groups.Add(_11d());
-            groups.Add(_10a());
+            //groups.Add(_10a());
 
-            superGroups.Add(_vtoriEzik12BV());
+            //superGroups.Add(_vtoriEzik12BV());
             superGroups.Add(_vtoriEzik11BV());
             superGroups.Add(_vtoriEzik11AD());
             superGroups.Add(_vtoriEzik12AG());
@@ -694,9 +694,10 @@ namespace SchoolManager
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            sg.gen();
+            var schedule = sg.gen();
             sw.Stop();
 
+            schedule.print();
             Console.WriteLine($"Ellapsed total time = {sw.ElapsedMilliseconds}");
         }
     }

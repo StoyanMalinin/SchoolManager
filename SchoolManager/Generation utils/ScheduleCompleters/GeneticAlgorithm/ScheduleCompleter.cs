@@ -25,7 +25,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.GeneticAlgorithm
             this.maxLessons = maxLessons;
             this.supergroupMultilessons = compressSGMultilesons(supergroupMultilessons.Select(x => Tuple.Create(x.Item1.Clone(), x.Item2)).ToList());
 
-            this.baseConfig = new ConfigurationState(state, teachers, supergroupMultilessons, true, maxLessons);
+            this.baseConfig = new ConfigurationState(this.state, this.teachers, this.supergroupMultilessons, true, this.maxLessons);            
         }
 
         private List<Tuple<SuperGroup, int>> compressSGMultilesons(List<Tuple<SuperGroup, int>> l)
@@ -47,35 +47,40 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.GeneticAlgorithm
 
         public DaySchedule geneticAlgorithm(bool onlyConsequtive)
         {
+            if (supergroupMultilessons.Count == 3)
+            {
+
+            }
+
             List<ConfigurationState> generation = new List<ConfigurationState>() { baseConfig };
             for (int g = 0; g < state.Count; g++)
             {
+                //var watch = System.Diagnostics.Stopwatch.StartNew();
                 List<ConfigurationState> newGeneration = new List<ConfigurationState>();
                 foreach (ConfigurationState cs in generation)
                 {
                     cs.prepareForMutations(g);
-                    for (int iter = 0; iter < Math.Min(100, cs.options.Count*1.5); iter++)
+                    for (int iter = 0; iter < Math.Min(50, cs.options.Count*1.5); iter++)
                     {
-                        var newElement = ObjectExtensions.Copy(cs, new HashSet<string>() { "options" });
+                        var newElement = cs.Clone();
                         if(newElement.mutate(g)==true) newGeneration.Add(newElement);
                     }
                 }
+                //watch.Stop(); Console.WriteLine($"New gen time = {watch.ElapsedMilliseconds}");
 
                 newGeneration = newGeneration.GroupBy(cs => cs.getState(g)).Select(x => x.First()).ToList();
                 Console.WriteLine($"Group {g} -> {newGeneration.Count}");
-                generation = newGeneration.OrderByDescending(cs => cs.fitness(g)).Where(cs => cs.fitness(g)!=double.MinValue).Take(100).ToList();
+
+                //watch.Restart();
+                generation = newGeneration.OrderByDescending(cs => cs.fitness(g)).Where(cs => cs.fitness(g)!=double.MinValue).Take(50).ToList();
+                //watch.Stop(); Console.WriteLine($"Nz i az kvo vreme = {watch.ElapsedMilliseconds}");
+
                 //Console.WriteLine(string.Join(" ", generation.Select(cs => cs.fitness(g))));
             }
 
             if (generation.Count == 0) return null;
 
-            DaySchedule output = new DaySchedule(generation[0].solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null) ? null : y.Item2)).ToList()).ToList(),
-                                                 teachers, state,
-                                                 generation[0].solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null || y.Item1 < teachers.Count) ? null
-                                                 : supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count)
-                                                                                    .First(ind => generation[0].superTeacherInd[ind] == y.Item1)].Item1)).ToList()).ToList()
-                                                 , maxLessons);
-            
+            var output = new DaySchedule(generation[0].solution, state, teachers, supergroupMultilessons, generation[0], maxLessons);
             return output;
         }
 

@@ -9,8 +9,20 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.GeneticAlgorithm
     {
         private int[] teacherLeftLessons;
         private static Random rnd = new Random(22);
-        public readonly List<Tuple<int, Subject>>[] solution;
+        public  List<Tuple<int, Subject>>[] solution;
 
+        public List<TeacherList> options;
+
+        public ConfigurationState(ConfigurationState other) : base(other)
+        {
+            this.teacherLeftLessons = new int[other.teacherLeftLessons.GetLength(0)];
+            Array.Copy(other.teacherLeftLessons, this.teacherLeftLessons, other.teacherLeftLessons.Length);
+
+            this.options = other.options;
+
+            this.solution = new List<Tuple<int, Subject>>[other.solution.GetLength(0)];
+            Array.Copy(other.solution, this.solution, other.solution.Length);
+        }
         public ConfigurationState(List<Group> state, List<Teacher> teachers, List<Tuple<SuperGroup, int>> supergroupMultilessons,
                                   bool onlyConsequtive, int maxLessons)
                : base(state, teachers, supergroupMultilessons, onlyConsequtive, maxLessons)
@@ -54,30 +66,44 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.GeneticAlgorithm
             foreach (var item in l)
             {
                 if (item.Item1 < teachers.Count) teacherLeftLessons[item.Item1] += change;
-                else teacherDependees[item.Item1].ForEach(t => teacherLeftLessons[t] += change);
+                else
+                {
+                    foreach (var t in teacherDependees[item.Item1])
+                        teacherLeftLessons[t] += change;
+                }
             }
         }
 
-        public List<TeacherList> options;
         public void prepareForMutations(int g)
         {
             options = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true).ToList();
         }
 
+        private double? fitnessCache = null;
         public bool mutate(int g)
         {
-            //List<TeacherList> options = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true).ToList();
+            List<TeacherList> options = teacherPermList[g].Where(tl => checkSuitable(tl, onlyConsequtive) == true).ToList();
             if (options.Count == 0)
                 return false;
+            fitnessCache = null;
 
             TeacherList tl = options[rnd.Next(options.Count)];
             solution[g] = tl.l;
             applyPermution(tl);
+
             return true;
+        }
+
+        public new ConfigurationState Clone()
+        {
+            return new ConfigurationState(this);
         }
 
         public double fitness(int g)
         {
+            if (fitnessCache != null)
+                return fitnessCache.Value;
+
             double lessonGapSum = 0;
             for (int t = 0; t < teachers.Count; t++)
             {
@@ -101,7 +127,8 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.GeneticAlgorithm
                 if (furtherOptionsProduct == 0) return double.MinValue;
             }
 
-            return furtherOptionsProduct + lessonGapSum;
+            fitnessCache = furtherOptionsProduct + lessonGapSum;
+            return fitnessCache.Value;
         }
 
         public override void applyPermution(TeacherList tl)

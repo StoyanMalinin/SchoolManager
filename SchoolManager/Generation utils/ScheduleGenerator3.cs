@@ -459,8 +459,6 @@ namespace SchoolManager.Generation_utils
                 }
             }
             
-            
-            
             return ds;
         }
 

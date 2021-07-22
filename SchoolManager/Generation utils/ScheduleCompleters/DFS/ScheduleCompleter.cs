@@ -49,12 +49,7 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters.DFS
             if (output != null) return;
             if (g == state.Count)
             {
-                output = new DaySchedule(solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null)?null:y.Item2)).ToList()).ToList(), 
-                                         teachers, state, 
-                                         solution.Where(x => (!(x is null))).Select(x => x.Select(y => ((y is null || y.Item1 < teachers.Count) ? null 
-                                         : supergroupMultilessons[Enumerable.Range(0, supergroupMultilessons.Count)
-                                                                            .First(ind => config.superTeacherInd[ind]==y.Item1)].Item1)).ToList()).ToList()
-                                         , maxLessons);
+                output = new DaySchedule(solution, state, teachers, supergroupMultilessons, config, maxLessons);
                 return;
             }
 

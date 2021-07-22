@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using SchoolManager.ArrayExtensions;
+using System.Collections.Generic;
 using System.Reflection;
-using System.ArrayExtensions;
+using System;
 
-namespace System
+namespace SchoolManager
 {
     public static class ObjectExtensions
     {
@@ -14,11 +15,11 @@ namespace System
             return (type.IsValueType & type.IsPrimitive);
         }
 
-        public static Object Copy(this Object originalObject, HashSet<string> excluded)
+        public static Object Copy(this Object originalObject)
         {
-            return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()), excluded);
+            return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()));
         }
-        private static Object InternalCopy(Object originalObject, IDictionary<Object, Object> visited, HashSet<string> excluded)
+        private static Object InternalCopy(Object originalObject, IDictionary<Object, Object> visited)
         {
             if (originalObject == null) return null;
             var typeToReflect = originalObject.GetType();
@@ -32,41 +33,39 @@ namespace System
                 if (IsPrimitive(arrayType) == false)
                 {
                     Array clonedArray = (Array)cloneObject;
-                    clonedArray.ForEach((array, indices) => array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited, excluded), indices));
+                    clonedArray.ForEach((array, indices) => array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited), indices));
                 }
 
             }
             visited.Add(originalObject, cloneObject);
-            CopyFields(originalObject, visited, cloneObject, typeToReflect, excluded);
-            RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect, excluded);
+            CopyFields(originalObject, visited, cloneObject, typeToReflect);
+            RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect);
             return cloneObject;
         }
 
-        private static void RecursiveCopyBaseTypePrivateFields(object originalObject, IDictionary<object, object> visited, object cloneObject, 
-                                                               Type typeToReflect, HashSet<string> excluded)
+        private static void RecursiveCopyBaseTypePrivateFields(object originalObject, IDictionary<object, object> visited, object cloneObject, Type typeToReflect)
         {
             if (typeToReflect.BaseType != null)
             {
-                RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect.BaseType, excluded);
-                CopyFields(originalObject, visited, cloneObject, typeToReflect.BaseType, excluded, BindingFlags.Instance | BindingFlags.NonPublic, info => info.IsPrivate);
+                RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect.BaseType);
+                CopyFields(originalObject, visited, cloneObject, typeToReflect.BaseType, BindingFlags.Instance | BindingFlags.NonPublic, info => info.IsPrivate);
             }
         }
 
-        private static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject, 
-                                       Type typeToReflect, HashSet<string> excluded, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
+        private static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject, Type typeToReflect, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
         {
             foreach (FieldInfo fieldInfo in typeToReflect.GetFields(bindingFlags))
             {
                 if (filter != null && filter(fieldInfo) == false) continue;
                 if (IsPrimitive(fieldInfo.FieldType)) continue;
                 var originalFieldValue = fieldInfo.GetValue(originalObject);
-                var clonedFieldValue = ((fieldInfo.IsInitOnly==true || (excluded!=null && excluded.Contains(fieldInfo.Name)==true))?originalFieldValue:InternalCopy(originalFieldValue, visited, excluded));
+                var clonedFieldValue = InternalCopy(originalFieldValue, visited);
                 fieldInfo.SetValue(cloneObject, clonedFieldValue);
             }
         }
-        public static T Copy<T>(this T original, HashSet<string> excluded = null)
+        public static T Copy<T>(this T original)
         {
-            return (T)Copy((Object)original, excluded);
+            return (T)Copy((Object)original);
         }
     }
 
@@ -129,4 +128,5 @@ namespace System
             }
         }
     }
+
 }

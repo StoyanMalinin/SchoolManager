@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SchoolManager.Generation_utils;
 using SchoolManager.School_Models;
+
 namespace SchoolManager
 {
     class Program

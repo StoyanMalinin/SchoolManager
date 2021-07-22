@@ -8,23 +8,49 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
 {
     class ConfigurationStateBase
     {
-        protected readonly int maxLessons;
+        protected int maxLessons;
 
-        protected readonly List<Group> state;
-        protected readonly bool onlyConsequtive;
-        protected readonly List<Teacher> teachers;
-        protected readonly List<Tuple<SuperGroup, int>> supergroupMultilessons;
+        public readonly List<Group> state;
+        public readonly bool onlyConsequtive;
+        public readonly List<Teacher> teachers;
+        public readonly List<Tuple<SuperGroup, int>> supergroupMultilessons;
 
         protected readonly int[] lastPosSeen;
         protected int[,] lessonTeacher;
         protected bool[] isTeacherLocked;
         protected bool[,] teacherPosLocked;
 
-        public readonly int[] superTeacherInd;
-        protected readonly List<int>[] teacherDependees;
+        public int[] superTeacherInd;
+        protected List<int>[] teacherDependees;
 
         public readonly List<Tuple<int, Subject>>[] teacherList;
         public readonly IEnumerable<TeacherList>[] teacherPermList;
+
+        public ConfigurationStateBase() { }
+        public ConfigurationStateBase(ConfigurationStateBase other)
+        {
+            this.state = other.state;
+            this.teachers = other.teachers;
+            this.maxLessons = other.maxLessons;
+            this.onlyConsequtive = other.onlyConsequtive;
+            this.supergroupMultilessons = other.supergroupMultilessons;
+
+            this.superTeacherInd = other.superTeacherInd;
+            this.teacherDependees = other.teacherDependees;
+            this.teacherList = other.teacherList;
+            this.teacherPermList = other.teacherPermList;
+
+            this.lastPosSeen = other.lastPosSeen;
+
+            this.lessonTeacher = new int[other.lessonTeacher.GetLength(0), other.lessonTeacher.GetLength(1)];
+            Array.Copy(other.lessonTeacher, lessonTeacher, other.lessonTeacher.Length);
+
+            this.isTeacherLocked = new bool[other.isTeacherLocked.GetLength(0)];
+            Array.Copy(other.isTeacherLocked, isTeacherLocked, other.isTeacherLocked.Length);
+
+            this.teacherPosLocked = new bool[other.teacherPosLocked.GetLength(0), other.teacherPosLocked.GetLength(1)];
+            Array.Copy(other.teacherPosLocked, this.teacherPosLocked, other.teacherPosLocked.Length);
+        }
 
         public ConfigurationStateBase(List<Group> state, List<Teacher> teachers, List<Tuple<SuperGroup, int>> supergroupMultilessons, bool onlyConsequtive, int maxLessons)
         {
@@ -231,6 +257,11 @@ namespace SchoolManager.Generation_utils.ScheduleCompleters
                 }
                 lessonTeacher[lesson, tl.l[lesson].Item1]--;
             }
+        }
+
+        public ConfigurationStateBase Clone()
+        {
+            return new ConfigurationStateBase(this);
         }
     }
 }
